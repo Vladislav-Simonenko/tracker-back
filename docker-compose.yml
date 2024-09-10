@@ -1,56 +1,29 @@
-version: '3'
-
+version: '3.8'
 services:
-  app:
-    container_name: nest-app
+  nest-api:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: nest-api
+    restart: always
     ports:
-      - '3000:3000'
+      - 3000:3000
     depends_on:
       - postgres
-    environment:
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
-      - DATABASE_NAME=nestdb
-    networks:
-      - backend
+    env_file:
+      - .env
 
   postgres:
-    image: postgres
-    container_name: postgres
+    image: postgres:latest
+    container_name: postgresprisma
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: nestdb
     ports:
-      - '5432:5432'
+      - 5432:5432
+    env_file:
+      - .env
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - backend
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - '5050:80'
-    depends_on:
-      - postgres
-    networks:
-      - backend
-
-networks:
-  backend:
-    driver: bridge
+      - postgres:/var/lib/postgresql/data
 
 volumes:
-  postgres-data:
+  postgres:
+    name: nest-prisma-docker-db
