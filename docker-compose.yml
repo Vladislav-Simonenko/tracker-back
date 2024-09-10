@@ -3,6 +3,7 @@ version: '3'
 services:
   app:
     container_name: nest-app
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,11 +17,12 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
       - DATABASE_NAME=nestdb
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/nestdb?schema=public
     networks:
       - backend
 
   postgres:
-    image: postgres
+    image: postgres:latest
     container_name: postgres
     restart: always
     environment:
