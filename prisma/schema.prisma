@@ -14,11 +14,21 @@ generator client {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  fullname  String?
-  password String
-  login String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  fullname        String?
+  password        String
+  login           String   @unique
+  role            Role     @default(USER)
+  isVerified      Boolean  @default(false)
+  verificationToken String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("user")
+}
+
+enum Role {
+  USER
+  ADMIN
 }
