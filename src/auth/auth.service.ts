@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -28,10 +32,6 @@ export class AuthService {
         login,
         role: 'USER',
         verificationToken: uuidv4(),
-        //@ts-ignore
-        Vlad,
-        //@ts-ignore
-        Vlad2,
       },
     });
 
@@ -137,10 +137,10 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
-    // @note: десь нужно создать токен и отправить ссылку для восстановления пароля на email,с использованием MailerService
+    // NOTE: десь нужно создать токен и отправить ссылку для восстановления пароля на email,с использованием MailerService
 
     return { message: 'Password reset link has been sent to your email.' };
   }
@@ -156,7 +156,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('Invalid or expired token');
+      throw new UnauthorizedException('Invalid or expired token');
     }
 
     await this.prisma.user.update({

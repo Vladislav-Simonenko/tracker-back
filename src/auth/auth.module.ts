@@ -15,7 +15,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60s' },
     }),
-    // @note
+    // NOTE
     // MailerModule.forRoot({
     // Настройте параметры MailerModule в зависимости от используемой почтовой службы
     // }),

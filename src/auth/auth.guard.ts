@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
       });
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException('smth went wrong');
+      throw new UnauthorizedException('Invalid or expired token');
     }
     return true;
   }
