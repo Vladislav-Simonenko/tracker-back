@@ -1,33 +1,31 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Post,
   Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
-import { AuthService } from './auth.service';
-import { Request as ExpressRequest } from 'express';
+import { AuthGuard } from '@auth/auth.guard';
+import { AuthService } from '@auth/auth.service';
 import { User } from '@prisma/client';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
+import {
+  RegisterUserDto,
+  LoginUserDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  RefreshTokenDto,
+} from './dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-  @HttpCode(HttpStatus.OK)
   @Post('register')
   async register(@Body() body: RegisterUserDto) {
     if (body.password !== body.confirmPassword) {
-      throw new Error('Passwords do not match');
+      throw new BadRequestException('Passwords do not match');
     }
     return this.authService.register(body.email, body.password, body.login);
   }
@@ -37,7 +35,6 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
@@ -45,7 +42,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req: ExpressRequest & { user?: User }) {
+  getProfile(@Request() req: Request & { user?: User }) {
     return req.user;
   }
 
@@ -61,7 +58,6 @@ export class AuthController {
       resetPasswordDto.newPassword,
     );
   }
-  @HttpCode(HttpStatus.OK)
   @Post('refresh-token')
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshToken(refreshTokenDto);
@@ -69,7 +65,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AuthGuard)
-  async logout(@Request() req: any) {
+  async logout(@Request() req: Request & { user: User }) {
     return this.authService.logout(req.user.id);
   }
 }

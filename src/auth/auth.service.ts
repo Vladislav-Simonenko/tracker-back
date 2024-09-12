@@ -28,6 +28,10 @@ export class AuthService {
         login,
         role: 'USER',
         verificationToken: uuidv4(),
+        //@ts-ignore
+        Vlad,
+        //@ts-ignore
+        Vlad2,
       },
     });
 
@@ -122,7 +126,6 @@ export class AuthService {
   }
 
   async logout(userId: number): Promise<{ message: string }> {
-    // При выходе из системы удаляем refreshToken
     await this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken: null },
@@ -137,8 +140,7 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    // Здесь нужно создать токен и отправить ссылку для восстановления пароля на email
-    // с использованием MailerService
+    // @note: десь нужно создать токен и отправить ссылку для восстановления пароля на email,с использованием MailerService
 
     return { message: 'Password reset link has been sent to your email.' };
   }
