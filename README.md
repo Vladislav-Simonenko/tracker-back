@@ -87,3 +87,5 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 ## launching Prisma migrations
 
 docker exec -it nest-app npx prisma migrate dev
+
+docker exec -it nest-app npx prisma db push

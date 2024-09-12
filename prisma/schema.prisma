@@ -1,16 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model User {
@@ -20,7 +14,6 @@ model User {
   password          String
   login             String   @unique
   role              Role     @default(USER)
-  //@note: верификация по дефолту в состоянии true, это временное решение до подключения сервиса верификации
   isVerified        Boolean  @default(true)
   verificationToken String
   resetToken        String?
