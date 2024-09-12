@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('NestJS API')
-    .setDescription('API documentation')
+    .setDescription('API ')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
