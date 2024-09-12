@@ -18,6 +18,7 @@ import {
   ResetPasswordDto,
   RefreshTokenDto,
 } from './dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -39,11 +40,15 @@ export class AuthController {
   async login(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
   }
-
+  @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req: Request & { user?: User }) {
-    return req.user;
+    return {
+      id: req.user?.id,
+      email: req.user?.email,
+      role: req.user?.role,
+    };
   }
 
   @Post('forgot-password')

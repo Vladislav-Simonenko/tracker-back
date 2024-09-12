@@ -1,7 +1,7 @@
 #!/bin/bash
 
-npx prisma generate
+docker exec -it nest-app npx prisma migrate dev
 
-npx prisma migrate dev
+docker exec -it nest-app npx prisma db push
 
 exec "$@"
