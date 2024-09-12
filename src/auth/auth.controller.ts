@@ -42,7 +42,7 @@ export class AuthController {
   }
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard)
-  @Get('proffile')
+  @Get('profile')
   getProfile(@Request() req: Request & { user?: User }) {
     return {
       id: req.user?.id,
