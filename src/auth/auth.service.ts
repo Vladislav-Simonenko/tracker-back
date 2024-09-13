@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 // import { MailerService } from 'src/mailer/mailer.service';
-import * as bcrypt from 'bcryptjs';
+import * as bcryptjs from 'bcryptjs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
@@ -24,7 +24,7 @@ export class AuthService {
     password: string,
     login: string,
   ): Promise<{ message: string }> {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
     const user = await this.prisma.user.create({
       data: {
         email,
@@ -73,7 +73,7 @@ export class AuthService {
 
     if (
       !user ||
-      !(await bcrypt.compare(password, user.password)) ||
+      !(await bcryptjs.compare(password, user.password)) ||
       !user.isVerified
     ) {
       throw new UnauthorizedException('Invalid credentials');
@@ -149,7 +149,7 @@ export class AuthService {
     token: string,
     newPassword: string,
   ): Promise<{ message: string }> {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcryptjs.hash(newPassword, 10);
 
     const user = await this.prisma.user.findFirst({
       where: { resetToken: token },

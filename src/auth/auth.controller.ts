@@ -18,9 +18,10 @@ import {
   ResetPasswordDto,
   RefreshTokenDto,
 } from './dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@Controller('auth')
+@ApiTags('auth')
+@Controller('/api/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
   @Post('register')
