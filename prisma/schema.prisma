@@ -15,9 +15,6 @@ model User {
   login             String   @unique
   role              Role     @default(USER)
   isVerified        Boolean  @default(true)
-  verificationToken String
-  resetToken        String?
-  refreshToken      String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
