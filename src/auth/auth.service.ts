@@ -144,10 +144,10 @@ export class AuthService {
 
     const resetToken = await this.jwtService.signAsync(
       { sub: user.id, email: user.email },
-      { expiresIn: '1h' }, // Токен действует 1 час
+      { expiresIn: '1h' },
     );
 
-    // NOTE: десь нужно создать токен и отправить ссылку для восстановления пароля на email,с использованием MailerService
+    // NOTE: Здесь нужно создать токен и отправить ссылку для восстановления пароля на email,с использованием MailerService
 
     return { message: 'Password reset link has been sent to your email.' };
   }
