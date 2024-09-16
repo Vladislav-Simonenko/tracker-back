@@ -31,16 +31,17 @@ export class AuthService {
         password: hashedPassword,
         login,
         role: 'USER',
-        verificationToken: uuidv4(),
+        isVerified: true,
       },
     });
 
-    // появится в более поздних версиях
-    // await this.mailerService.sendVerificationEmail(
-    //   user.email,
-
-    //   user?.verificationToken,
+    // const verificationToken = await this.jwtService.signAsync(
+    //   { sub: user.id, email: user.email },
+    //   { expiresIn: '1h' },
     // );
+
+    // NOTE: Отправляем verificationToken по email
+    // await this.mailerService.sendVerificationEmail(user.email, verificationToken);
 
     return {
       message:
@@ -49,20 +50,30 @@ export class AuthService {
   }
 
   async verifyEmail(token: string): Promise<{ message: string }> {
-    const user = await this.prisma.user.findFirst({
-      where: { verificationToken: token },
-    });
+    try {
+      const payload = this.jwtService.verify(token);
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid verification token.');
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found.');
+      }
+
+      if (user.isVerified) {
+        return { message: 'Email already verified.' };
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { isVerified: true },
+      });
+
+      return { message: 'Email successfully verified.' };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired verification token.');
     }
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { isVerified: true, verificationToken: '' },
-    });
-
-    return { message: 'Email successfully verified.' };
   }
 
   async login(
@@ -87,11 +98,6 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken },
-    });
-
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -110,8 +116,8 @@ export class AuthService {
         where: { id: payload.sub },
       });
 
-      if (!user || user.refreshToken !== refreshToken) {
-        throw new UnauthorizedException('Invalid refresh token');
+      if (!user) {
+        throw new UnauthorizedException('User not found');
       }
 
       const newAccessToken = await this.jwtService.signAsync(
@@ -126,10 +132,6 @@ export class AuthService {
   }
 
   async logout(userId: number): Promise<{ message: string }> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: null },
-    });
     return { message: 'Logged out successfully' };
   }
 
@@ -140,6 +142,11 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    const resetToken = await this.jwtService.signAsync(
+      { sub: user.id, email: user.email },
+      { expiresIn: '1h' }, // Токен действует 1 час
+    );
+
     // NOTE: десь нужно создать токен и отправить ссылку для восстановления пароля на email,с использованием MailerService
 
     return { message: 'Password reset link has been sent to your email.' };
@@ -149,24 +156,27 @@ export class AuthService {
     token: string,
     newPassword: string,
   ): Promise<{ message: string }> {
-    const hashedPassword = await bcryptjs.hash(newPassword, 10);
+    try {
+      const payload = this.jwtService.verify(token);
 
-    const user = await this.prisma.user.findFirst({
-      where: { resetToken: token },
-    });
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid or expired token');
+      if (!user) {
+        throw new UnauthorizedException('User not found.');
+      }
+
+      const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword },
+      });
+
+      return { message: 'Password has been reset successfully.' };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired reset token.');
     }
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-        resetToken: null,
-      },
-    });
-
-    return { message: 'Password has been reset successfully.' };
   }
 }

@@ -4,23 +4,34 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcryptjs from 'bcryptjs';
 import * as crypto from 'crypto';
+import { UserRole } from './dto/user-role.dto';
+import { AuthService } from '@auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private authService: AuthService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcryptjs.hash(createUserDto.password, 10);
-    const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         ...createUserDto,
         password: hashedPassword,
-        verificationToken,
-        isVerified: createUserDto.isVerified ?? true,
+        isVerified: true,
       },
     });
+    const loginDto = {
+      email: user.email,
+      password: createUserDto.password,
+    };
+    return {
+      message:
+        'Registration successful. Please check your email to verify your account.',
+    };
   }
 
   async findAll() {
@@ -50,11 +61,11 @@ export class UsersService {
         where: { id },
       });
     } catch (error) {
-      return null;
+      return { message: 'the user could not be deleted.' };
     }
   }
 
-  async updateUserRole(id: number, role: 'USER' | 'ADMIN' | 'MASTER') {
+  async updateUserRole(id: number, role: UserRole) {
     return this.prisma.user.update({
       where: { id },
       data: { role },

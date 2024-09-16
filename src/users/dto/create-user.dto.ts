@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from './user-role.dto';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -21,7 +22,8 @@ export class CreateUserDto {
     description: 'The role of the user',
     example: 'MASTER',
   })
-  role: 'USER' | 'ADMIN' | 'MASTER';
+  role: UserRole;
+
   isVerified?: true;
 
   @ApiProperty({
