@@ -17,6 +17,8 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { createItemSchema } from './shema/create-item.shema';
+import { updateItemShema } from './shema/update-item.shema';
 
 @ApiTags('items')
 @Controller('/api/items')
@@ -30,34 +32,14 @@ export class ItemController {
 
   @Get(':id')
   async getItemById(@Param('id') id: string) {
-    return this.itemService.getItemById(Number(id));
+    return this.itemService.getItemById(id);
   }
 
   @Post()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Create a new item with an image',
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-        name_rus: { type: 'string' },
-        name_eng: { type: 'string' },
-        homebrew: { type: 'boolean' },
-        price: { type: 'string' },
-        source: { type: 'string' },
-        weight: { type: 'string' },
-        description: { type: 'string' },
-        categories: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        world_id: { type: 'number' },
-      },
-    },
+    schema: createItemSchema,
   })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -98,27 +80,7 @@ export class ItemController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Update an existing item with an image',
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-        name_rus: { type: 'string' },
-        name_eng: { type: 'string' },
-        homebrew: { type: 'boolean' },
-        price: { type: 'string' },
-        source: { type: 'string' },
-        weight: { type: 'string' },
-        description: { type: 'string' },
-        categories: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        world_id: { type: 'number' },
-      },
-    },
+    schema: updateItemShema,
   })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -153,11 +115,11 @@ export class ItemController {
       icon: iconPath,
     };
 
-    return this.itemService.updateItem(Number(id), updateItemDto);
+    return this.itemService.updateItem(id, updateItemDto);
   }
 
   @Delete(':id')
   async deleteItem(@Param('id') id: string) {
-    return this.itemService.deleteItem(Number(id));
+    return this.itemService.deleteItem(id);
   }
 }

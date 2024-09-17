@@ -11,6 +11,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
+import { uploadSchema } from './shema/upload.shema';
 
 @ApiTags('upload')
 @Controller('/api/upload')
@@ -20,15 +21,7 @@ export class UploadController {
   @ApiBody({
     description: 'Upload an image file',
     type: 'multipart/form-data',
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
+    schema: uploadSchema,
   })
   @UseInterceptors(
     FileInterceptor('file', {

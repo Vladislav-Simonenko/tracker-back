@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateItemDto {
   @ApiProperty({
-    description: 'The name of the subject in Russian',
+    description: 'The name of the item in Russian',
     example: 'Доспех',
   })
   name_rus: string;
 
   @ApiProperty({
-    description: 'The name of the subject in English',
+    description: 'The name of the item in English',
     example: 'The armor',
   })
   name_eng: string;
 
   @ApiProperty({
-    description: 'the rules of the game',
+    description: 'Whether the item is homebrew',
     example: true,
   })
   homebrew: boolean;
@@ -26,16 +26,16 @@ export class CreateItemDto {
   price: string;
 
   @ApiProperty({
-    description: 'Abbreviation',
+    description: 'Source abbreviation',
     example: 'PHB',
   })
   source: string;
 
   @ApiProperty({
-    description: 'Weight items',
+    description: 'Weight of the item',
     example: '1',
   })
-  weight: string;
+  weight?: string | null;
 
   @ApiProperty({
     description: 'Description of the item',
@@ -44,7 +44,7 @@ export class CreateItemDto {
   description: string;
 
   @ApiProperty({
-    description: 'What categories does the subject belong to?',
+    description: 'Categories the item belongs to',
     example: ['Боеприпасы'],
   })
   categories: string[];
@@ -58,7 +58,7 @@ export class CreateItemDto {
   icon?: string | null;
 
   @ApiProperty({
-    description: 'Which world does the item belong to',
+    description: 'World ID the item belongs to',
     example: 1,
     required: false,
   })

@@ -1,46 +1,577 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id                Int      @id @default(autoincrement())
-  email             String   @unique
-  fullname          String?
-  password          String
-  login             String   @unique
-  role              Role     @default(USER)
-  isVerified        Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  fullname   String?
+  password   String
+  login      String   @unique
+  role       Role     @default(USER)
+  isVerified Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("user")
 }
 
-model Item {
-  id                Int      @id @default(autoincrement())
-  name_rus          String
-  name_eng          String
-  homebrew          Boolean
-  price             String?
-  source            String
-  weight            String?
-  description       String?
-  categories        String[]
-  icon              String?
-  world_id          BigInt?
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model armors {
+  name_rus                        String?  @default("")
+  name_eng                        String?  @default("")
+  type                            Int      @db.SmallInt
+  base_ac                         BigInt?
+  ac                              String?
+  price                           String?
+  source                          String?
+  weight                          Float?
+  description                     String?
+  duration                        String?
+  disadvantage                    Boolean?
+  requirement                     BigInt?
+  homebrew                        Boolean?
+  icon                            String?
+  id                              BigInt   @id @unique @default(autoincrement())
+  heroes_heroes_armor_idToarmors  heroes[] @relation("heroes_armor_idToarmors")
+  heroes_heroes_shield_idToarmors heroes[] @relation("heroes_shield_idToarmors")
 }
 
-model World {
-  id                Int      @id @default(autoincrement())
-  createdAt         DateTime @default(now())
-  user_id           Int
-  name              String
-  sources           String[]
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model auto_prepared_spells {
+  spell_id    String
+  subclass_id BigInt?
+  class_id    Int?        @db.SmallInt
+  id          BigInt      @id @unique @default(autoincrement())
+  classes     classes?    @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  spells      spells      @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  subclasses  subclasses? @relation(fields: [subclass_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model battle_members {
+  id         BigInt    @id(map: "battle_member_pkey") @default(autoincrement())
+  world_id   BigInt
+  initiative BigInt?
+  max_hp     BigInt?
+  current_hp BigInt?
+  hero_id    BigInt?
+  monster_id BigInt?
+  hidden     Boolean   @default(false)
+  name       String?
+  heroes     heroes?   @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  monsters   monsters? @relation(fields: [monster_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  worlds     worlds    @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model class_spells {
+  class_id Int     @db.SmallInt
+  spell_id String
+  classes  classes @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  spells   spells  @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([class_id, spell_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model classes {
+  id                   Int                    @id @default(autoincrement()) @db.SmallInt
+  name                 String?                @default("")
+  main_ability         String?                @default("cha")
+  hit_dice             Int?                   @db.SmallInt
+  icon                 String?
+  description          String?
+  subclass_level       Int                    @db.SmallInt
+  spell_ability        String?
+  metamagic            Boolean                @default(false)
+  auto_prepared_spells auto_prepared_spells[]
+  class_spells         class_spells[]
+  features             features[]
+  hero_levels          hero_levels[]
+  hero_spells          hero_spells[]
+  subclasses           subclasses[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model eldritch_invocations {
+  id                        String                      @id
+  name_rus                  String
+  name_eng                  String
+  requirements              String?
+  description               String
+  source                    String
+  spell_id                  String?
+  spells                    spells?                     @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  hero_eldritch_invocations hero_eldritch_invocations[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model features {
+  id          String      @id
+  class_id    Int?        @db.SmallInt
+  subclass_id BigInt?
+  description String?
+  level       Int?        @db.SmallInt
+  name        String
+  upgrade     String?
+  source      String
+  race_id     Int?        @db.SmallInt
+  subrace_id  Int?        @db.SmallInt
+  spell_id    String?
+  classes     classes?    @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  races       races?      @relation(fields: [race_id], references: [id], onUpdate: NoAction)
+  spells      spells?     @relation(fields: [spell_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subclasses  subclasses? @relation(fields: [subclass_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  subraces    subraces?   @relation(fields: [subrace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model fighting_styles {
+  id                   BigInt                 @id @default(autoincrement())
+  name                 String
+  description          String
+  hero_fighting_styles hero_fighting_styles[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_arcanums {
+  hero_id  BigInt
+  spell_id String
+  heroes   heroes @relation(fields: [hero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  spells   spells @relation(fields: [spell_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([hero_id, spell_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_eldritch_invocations {
+  hero_id                BigInt
+  eldritch_invocation_id String
+  eldritch_invocations   eldritch_invocations @relation(fields: [eldritch_invocation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  heroes                 heroes               @relation(fields: [hero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([hero_id, eldritch_invocation_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_fighting_styles {
+  hero_id         BigInt
+  style_id        BigInt
+  heroes          heroes          @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  fighting_styles fighting_styles @relation(fields: [style_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([hero_id, style_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_items {
+  hero_id BigInt
+  item_id String
+  count   Int     @default(1) @db.SmallInt
+  icon    String?
+  heroes  heroes  @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  items   items   @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([hero_id, item_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_levels {
+  hero_id       BigInt
+  class_id      Int         @db.SmallInt
+  level         Int         @db.SmallInt
+  subclass_id   BigInt?
+  metamagic_ids String[]    @default([])
+  basic         Boolean     @default(false)
+  classes       classes     @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  heroes        heroes      @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  subclasses    subclasses? @relation(fields: [subclass_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([hero_id, class_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_magic_items {
+  hero_id       BigInt
+  magic_item_id String
+  count         Int         @default(1) @db.SmallInt
+  icon          String?
+  heroes        heroes      @relation(fields: [hero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  magic_items   magic_items @relation(fields: [magic_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([hero_id, magic_item_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_skills {
+  hero_id   BigInt
+  skill_key String @id
+  level     Int    @db.SmallInt
+  heroes    heroes @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_spellbook {
+  hero_id  BigInt
+  spell_id String
+  heroes   heroes @relation(fields: [hero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  spells   spells @relation(fields: [spell_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([hero_id, spell_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_spells {
+  hero_id  BigInt
+  spell_id String
+  class_id Int     @db.SmallInt
+  classes  classes @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  heroes   heroes  @relation(fields: [hero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  spells   spells  @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([hero_id, spell_id, class_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_traits {
+  hero_id  BigInt
+  trait_id String
+  heroes   heroes @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  traits   traits @relation(fields: [trait_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([hero_id, trait_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model hero_weapons {
+  hero_id       BigInt
+  weapon_id     String
+  count         Int          @default(1) @db.SmallInt
+  magic_item_id String?
+  id            BigInt       @unique @default(autoincrement())
+  icon          String?
+  attack_bonus  Int          @default(0) @db.SmallInt
+  damage_bonus  Int          @default(0) @db.SmallInt
+  heroes        heroes       @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  magic_items   magic_items? @relation(fields: [magic_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  weapons       weapons      @relation(fields: [weapon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([id, hero_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model heroes {
+  id                              BigInt                      @id @default(autoincrement())
+  created_at                      DateTime                    @default(now()) @db.Timestamptz(6)
+  name                            String
+  world_id                        BigInt
+  user_id                         String?                     @db.Uuid
+  cha                             Int                         @default(10) @db.SmallInt
+  con                             Int                         @default(10) @db.SmallInt
+  dex                             Int                         @default(10) @db.SmallInt
+  int                             Int                         @default(10) @db.SmallInt
+  str                             Int                         @default(10) @db.SmallInt
+  wis                             Int                         @default(10) @db.SmallInt
+  notes                           String?                     @default("")
+  armorBonus                      Int                         @default(0) @db.SmallInt
+  armor_types_prof                String[]
+  buff_hp                         Int                         @default(0) @db.SmallInt
+  copper_coins                    Int                         @default(0)
+  silver_coins                    Int                         @default(0)
+  electrum_coins                  Int                         @default(0)
+  gold_coins                      Int                         @default(0)
+  platinum_coins                  Int                         @default(0)
+  current_hp                      Int                         @default(0) @db.SmallInt
+  image_url                       String?
+  max_hp                          Int                         @default(0) @db.SmallInt
+  temp_hp                         Int                         @default(0) @db.SmallInt
+  subrace_id                      Int?                        @db.SmallInt
+  race_id                         Int?                        @db.SmallInt
+  weapon_types_prof               String[]                    @default([])
+  creation_done                   Boolean                     @default(false)
+  traits                          String?
+  ideals                          String?
+  bounds                          String?
+  flaws                           String?
+  languages_ids                   Int[]                       @db.SmallInt
+  tools_ids                       Int[]                       @db.SmallInt
+  armor_id                        BigInt?
+  shield_id                       BigInt?
+  armor_bonus                     BigInt?
+  experience                      BigInt?
+  warlock_pact_id                 BigInt?
+  battle_members                  battle_members[]
+  hero_arcanums                   hero_arcanums[]
+  hero_eldritch_invocations       hero_eldritch_invocations[]
+  hero_fighting_styles            hero_fighting_styles[]
+  hero_items                      hero_items[]
+  hero_levels                     hero_levels[]
+  hero_magic_items                hero_magic_items[]
+  hero_skills                     hero_skills[]
+  hero_spellbook                  hero_spellbook[]
+  hero_spells                     hero_spells[]
+  hero_traits                     hero_traits[]
+  hero_weapons                    hero_weapons[]
+  armors_heroes_armor_idToarmors  armors?                     @relation("heroes_armor_idToarmors", fields: [armor_id], references: [id], onUpdate: NoAction)
+  races                           races?                      @relation(fields: [race_id], references: [id], onUpdate: NoAction)
+  armors_heroes_shield_idToarmors armors?                     @relation("heroes_shield_idToarmors", fields: [shield_id], references: [id], onUpdate: NoAction)
+  subraces                        subraces?                   @relation(fields: [subrace_id], references: [id], onUpdate: NoAction)
+  warlock_pacts                   warlock_pacts?              @relation(fields: [warlock_pact_id], references: [id], onUpdate: NoAction)
+  worlds                          worlds                      @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model items {
+  id          String  @id @default(uuid())
+  name_rus    String
+  name_eng    String
+  homebrew    Boolean
+  price       String
+  source      String
+  weight      String?
+  description String
+  categories  String[]
+  icon        String?
+  world_id    BigInt?
+  hero_items  hero_items[]
+  worlds      worlds?      @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model magic_items {
+  id                   String             @id(map: "magic_items_pkey1")
+  name_rus             String
+  name_eng             String
+  homebrew             Boolean
+  cost_dmg             String?
+  source               String
+  description          String
+  detailType           String[]
+  type                 String
+  rarity               String
+  cost_xge             String?
+  customization        Boolean
+  detailCustomization  String[]
+  allowed_weapon_ids   String[]           @default([])
+  allowed_weapon_types Int[]              @default([]) @db.SmallInt
+  icon                 String?
+  ext_icon             String?
+  world_id             BigInt?
+  spell_id             String?
+  hero_magic_items     hero_magic_items[]
+  hero_weapons         hero_weapons[]
+  spells               spells?            @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  worlds               worlds?            @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model monsters {
+  id                   BigInt           @id(map: "monster_pkey")
+  name_rus             String?
+  name_eng             String?
+  size                 Json?            @db.Json
+  type                 String?
+  challenge_rating     String?
+  url                  String?          @unique
+  source               String?
+  experience           BigInt?
+  armor_class          BigInt?
+  armors               Json[]           @db.Json
+  hits                 Json?            @db.Json
+  speed                Json[]           @db.Json
+  ability              Json?            @db.Json
+  skills               Json[]           @db.Json
+  senses               Json?            @db.Json
+  languages            String[]
+  feats                Json[]           @db.Json
+  actions              Json[]           @db.Json
+  bonus_actions        Json[]           @db.Json
+  tags                 Json[]
+  images               String[]
+  alignment            String?
+  saving_throws        Json[]
+  condition_immunities String[]
+  damage_immunities    String[]
+  proficiency_bonus    String?
+  reactions            Json[]
+  reaction             String?
+  damage_resistances   Json[]
+  legendary            Json?
+  lair                 Json?
+  battle_members       battle_members[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles {
+  id         String    @id @db.Uuid
+  updated_at DateTime? @db.Timestamptz(6)
+  full_name  String?
+  avatar_url String?
+  master     Boolean
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model races {
+  id          Int        @id @default(autoincrement()) @db.SmallInt
+  name        String?
+  icon        String?    @default("")
+  description String?
+  speed       Int        @default(30) @db.SmallInt
+  features    features[]
+  heroes      heroes[]
+  subraces    subraces[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model rules {
+  id          String @id
+  name        String
+  description String
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model spells {
+  id                   String                 @id
+  name_rus             String?
+  name_eng             String?
+  level                Int                    @db.SmallInt
+  school               String?
+  component_v          Boolean
+  component_s          Boolean
+  component_m          String?
+  source               String?
+  range                String?
+  duration             String?
+  time                 String?
+  description          String?
+  upper                String?
+  icon                 String
+  ritual               Boolean                @default(false)
+  auto_prepared_spells auto_prepared_spells[]
+  class_spells         class_spells[]
+  eldritch_invocations eldritch_invocations[]
+  features             features[]
+  hero_arcanums        hero_arcanums[]
+  hero_spellbook       hero_spellbook[]
+  hero_spells          hero_spells[]
+  magic_items          magic_items[]
+  subclass_spells      subclass_spells[]
+  trait_spells         trait_spells[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model subclass_spells {
+  subclass_id BigInt
+  spell_id    String
+  spells      spells     @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  subclasses  subclasses @relation(fields: [subclass_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([subclass_id, spell_id], map: "subslass_spells_pkey")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model subclasses {
+  id                   BigInt                 @id @default(autoincrement())
+  name                 String
+  class_id             Int                    @db.SmallInt
+  icon                 String?
+  description          String?
+  source               String?
+  spell_ability        String?
+  auto_prepared_spells auto_prepared_spells[]
+  features             features[]
+  hero_levels          hero_levels[]
+  subclass_spells      subclass_spells[]
+  classes              classes                @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model subraces {
+  id            Int        @id @default(autoincrement()) @db.SmallInt
+  name          String
+  race_id       Int        @db.SmallInt
+  icon          String?
+  description   String?
+  speed         Int?       @db.SmallInt
+  features_done Boolean    @default(false)
+  features      features[]
+  heroes        heroes[]
+  races         races      @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model trait_spells {
+  trait_id String
+  spell_id String
+  spells   spells @relation(fields: [spell_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  traits   traits @relation(fields: [trait_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([trait_id, spell_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model traits {
+  id           String         @id
+  name_rus     String
+  name_eng     String
+  requirements String
+  description  String
+  source       String
+  homebrew     Boolean
+  hero_traits  hero_traits[]
+  trait_spells trait_spells[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model warlock_pacts {
+  id          BigInt   @id @default(autoincrement())
+  name        String
+  description String
+  heroes      heroes[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model weapons {
+  id           String         @id
+  name_rus     String
+  name_eng     String
+  type         Int            @db.SmallInt
+  damage_dice  String?
+  damage_type  String
+  price        String
+  source       String
+  weight       Decimal        @db.Decimal
+  description  String
+  properties   Json[]
+  special      String?
+  homebrew     Boolean
+  icon         String?
+  world_id     BigInt?
+  hero_weapons hero_weapons[]
+  worlds       worlds?        @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model worlds {
+  id             BigInt           @id(map: "Worlds_pkey") @default(autoincrement())
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+  user_id        String           @db.Uuid
+  name           String           @db.VarChar
+  sources        String[]         @default([])
+  battle_members battle_members[]
+  heroes         heroes[]
+  items          items[]
+  magic_items    magic_items[]
+  weapons        weapons[]
 }
 
 enum Role {

@@ -8,11 +8,11 @@ export class ItemService {
   constructor(private prisma: PrismaService) {}
 
   async getAllItems() {
-    return this.prisma.item.findMany();
+    return this.prisma.items.findMany();
   }
 
-  async getItemById(id: number) {
-    const item = await this.prisma.item.findUnique({
+  async getItemById(id: string) {
+    const item = await this.prisma.items.findUnique({
       where: { id },
     });
     if (!item) {
@@ -22,34 +22,33 @@ export class ItemService {
   }
 
   async createItem(createItemDto: CreateItemDto) {
-    return this.prisma.item.create({
+    return this.prisma.items.create({
       data: {
         ...createItemDto,
-        icon: createItemDto.icon || null,
         world_id: createItemDto.world_id
           ? Number(createItemDto.world_id)
           : null,
+        icon: createItemDto.icon || null,
       },
     });
   }
 
-  async updateItem(id: number, updateItemDto: UpdateItemDto) {
-    const item = await this.prisma.item.update({
+  async updateItem(id: string, updateItemDto: UpdateItemDto) {
+    return this.prisma.items.update({
       where: { id },
       data: {
         ...updateItemDto,
-        icon: updateItemDto.icon ?? null,
         world_id: updateItemDto.world_id ?? null,
+        icon: updateItemDto.icon ?? null,
         categories: Array.isArray(updateItemDto.categories)
           ? updateItemDto.categories
           : undefined,
       },
     });
-    return item;
   }
 
-  async deleteItem(id: number) {
-    await this.prisma.item.delete({
+  async deleteItem(id: string) {
+    await this.prisma.items.delete({
       where: { id },
     });
     return { message: `Item with ID ${id} deleted` };

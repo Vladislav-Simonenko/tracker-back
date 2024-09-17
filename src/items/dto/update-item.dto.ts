@@ -2,21 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateItemDto {
   @ApiProperty({
-    description: 'The name of the subject in Russian',
+    description: 'The name of the item in Russian',
     example: 'Доспех',
-    required: false,
   })
-  name_rus?: string;
+  name_rus: string;
 
   @ApiProperty({
-    description: 'The name of the subject in English',
+    description: 'The name of the item in English',
     example: 'The armor',
-    required: false,
   })
-  name_eng?: string;
+  name_eng: string;
 
   @ApiProperty({
-    description: 'the rules of the game',
+    description: 'Whether the item is homebrew',
     example: true,
   })
   homebrew: boolean;
@@ -24,35 +22,30 @@ export class UpdateItemDto {
   @ApiProperty({
     description: 'Item price',
     example: '1.0 зм',
-    required: false,
   })
-  price?: string;
+  price: string;
 
   @ApiProperty({
-    description: 'Abbreviation',
+    description: 'Source abbreviation',
     example: 'PHB',
-    required: false,
   })
-  source?: string;
+  source: string;
 
   @ApiProperty({
-    description: 'Weight items',
+    description: 'Weight of the item',
     example: '1',
-    required: false,
   })
   weight?: string;
 
   @ApiProperty({
     description: 'Description of the item',
     example: 'This item was forged in dungeons, etc.',
-    required: false,
   })
-  description?: string;
+  description: string;
 
   @ApiProperty({
-    description: 'What categories does the subject belong to?',
+    description: 'Categories the item belongs to',
     example: ['Боеприпасы'],
-    required: false,
   })
   categories: string[];
 
@@ -60,14 +53,12 @@ export class UpdateItemDto {
     description: 'Icon image of the item (file upload)',
     type: 'string',
     format: 'binary',
-    required: false,
   })
   icon?: string | null;
 
   @ApiProperty({
-    description: 'Which world does the item belong to',
+    description: 'World ID the item belongs to',
     example: 1,
-    required: false,
   })
   world_id?: number | null;
 }
