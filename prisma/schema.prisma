@@ -21,6 +21,28 @@ model User {
   @@map("user")
 }
 
+model Item {
+  id                Int      @id @default(autoincrement())
+  name_rus          String
+  name_eng          String
+  homebrew          Boolean
+  price             String?
+  source            String
+  weight            String?
+  description       String?
+  categories        String[]
+  icon              String?
+  world_id          BigInt?
+}
+
+model World {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  user_id           Int
+  name              String
+  sources           String[]
+}
+
 enum Role {
   USER
   ADMIN
