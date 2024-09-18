@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateWeaponDto } from './dto/create-weapon.dto';
 import { UpdateWeaponDto } from './dto/update-weapon.dto';
@@ -8,10 +8,14 @@ export class WeaponsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createWeaponDto: CreateWeaponDto) {
-    const weapon = await this.prisma.weapons.create({
-      data: createWeaponDto,
-    });
-    return this.transformBigInt(weapon);
+    try {
+      const weapon = await this.prisma.weapons.create({
+        data: createWeaponDto,
+      });
+      return this.transformBigInt(weapon);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findAll() {
@@ -23,21 +27,45 @@ export class WeaponsService {
     const weapon = await this.prisma.weapons.findUnique({
       where: { id },
     });
+    if (!weapon) {
+      throw new NotFoundException(`Weapon with id ${id} not found`);
+    }
     return this.transformBigInt(weapon);
   }
 
   async update(id: string, updateWeaponDto: UpdateWeaponDto) {
-    return this.prisma.weapons.update({
-      where: { id },
-      data: updateWeaponDto,
-    });
+    try {
+      const weapon = await this.prisma.weapons.findUnique({
+        where: { id },
+      });
+      if (!weapon) {
+        throw new NotFoundException(`Weapon with id ${id} not found`);
+      }
+
+      return this.prisma.weapons.update({
+        where: { id },
+        data: updateWeaponDto,
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async remove(id: string) {
-    const weapon = await this.prisma.weapons.delete({
-      where: { id },
-    });
-    return this.transformBigInt(weapon);
+    try {
+      const weapon = await this.prisma.weapons.findUnique({
+        where: { id },
+      });
+      if (!weapon) {
+        throw new NotFoundException(`Weapon with id ${id} not found`);
+      }
+
+      return this.prisma.weapons.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   private transformBigInt(entity: any) {

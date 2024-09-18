@@ -4,6 +4,8 @@ import {
   Delete,
   Get,
   Inject,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -31,13 +33,24 @@ export class ItemController {
   @Get()
   @ApiOkResponse({ type: [GetItemDto] })
   async getAllItems() {
-    return this.itemService.getAllItems();
+    try {
+      return await this.itemService.getAllItems();
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to retrieve items');
+    }
   }
 
   @Get(':id')
   @ApiOkResponse({ type: GetItemByIdDto })
   async getItemById(@Param() params: GetItemByIdDto) {
-    return this.itemService.getItemById(params.id);
+    try {
+      return await this.itemService.getItemById(params.id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(`Item with ID ${params.id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to retrieve item');
+    }
   }
 
   @Post()
@@ -126,6 +139,13 @@ export class ItemController {
   @Delete(':id')
   @ApiOkResponse({ type: DeleteItemDto })
   async deleteItem(@Param() params: DeleteItemDto) {
-    return this.itemService.deleteItem(params.id);
+    try {
+      return await this.itemService.deleteItem(params.id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(`Item with ID ${params.id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to delete item');
+    }
   }
 }
