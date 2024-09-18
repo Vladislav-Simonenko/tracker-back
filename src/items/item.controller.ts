@@ -12,13 +12,16 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ItemService } from './item.service';
-import { ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { createItemSchema } from './shema/create-item.shema';
 import { updateItemShema } from './shema/update-item.shema';
+import { GetItemByIdDto } from './dto/get-item-id.dto';
+import { DeleteItemDto } from './dto/delete-item.dto';
+import { GetItemDto } from './dto/get-item.dto';
 
 @ApiTags('items')
 @Controller('/api/items')
@@ -26,13 +29,15 @@ export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Get()
+  @ApiOkResponse({ type: [GetItemDto] })
   async getAllItems() {
     return this.itemService.getAllItems();
   }
 
   @Get(':id')
-  async getItemById(@Param('id') id: string) {
-    return this.itemService.getItemById(id);
+  @ApiOkResponse({ type: GetItemByIdDto })
+  async getItemById(@Param() params: GetItemByIdDto) {
+    return this.itemService.getItemById(params.id);
   }
 
   @Post()
@@ -119,7 +124,8 @@ export class ItemController {
   }
 
   @Delete(':id')
-  async deleteItem(@Param('id') id: string) {
-    return this.itemService.deleteItem(id);
+  @ApiOkResponse({ type: DeleteItemDto })
+  async deleteItem(@Param() params: DeleteItemDto) {
+    return this.itemService.deleteItem(params.id);
   }
 }

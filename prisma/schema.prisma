@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
+  id         String      @id @default(uuid())
   email      String   @unique
   fullname   String?
   password   String
@@ -21,7 +21,6 @@ model User {
   @@map("user")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model armors {
   name_rus                        String?  @default("")
   name_eng                        String?  @default("")
@@ -42,7 +41,6 @@ model armors {
   heroes_heroes_shield_idToarmors heroes[] @relation("heroes_shield_idToarmors")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model auto_prepared_spells {
   spell_id    String
   subclass_id BigInt?
@@ -53,7 +51,6 @@ model auto_prepared_spells {
   subclasses  subclasses? @relation(fields: [subclass_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model battle_members {
   id         BigInt    @id(map: "battle_member_pkey") @default(autoincrement())
   world_id   BigInt
@@ -69,7 +66,6 @@ model battle_members {
   worlds     worlds    @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model class_spells {
   class_id Int     @db.SmallInt
   spell_id String
@@ -79,7 +75,6 @@ model class_spells {
   @@id([class_id, spell_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model classes {
   id                   Int                    @id @default(autoincrement()) @db.SmallInt
   name                 String?                @default("")
@@ -98,7 +93,6 @@ model classes {
   subclasses           subclasses[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model eldritch_invocations {
   id                        String                      @id
   name_rus                  String
@@ -111,7 +105,6 @@ model eldritch_invocations {
   hero_eldritch_invocations hero_eldritch_invocations[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model features {
   id          String      @id
   class_id    Int?        @db.SmallInt
@@ -131,7 +124,6 @@ model features {
   subraces    subraces?   @relation(fields: [subrace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model fighting_styles {
   id                   BigInt                 @id @default(autoincrement())
   name                 String
@@ -139,7 +131,6 @@ model fighting_styles {
   hero_fighting_styles hero_fighting_styles[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_arcanums {
   hero_id  BigInt
   spell_id String
@@ -149,7 +140,6 @@ model hero_arcanums {
   @@id([hero_id, spell_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_eldritch_invocations {
   hero_id                BigInt
   eldritch_invocation_id String
@@ -159,7 +149,6 @@ model hero_eldritch_invocations {
   @@id([hero_id, eldritch_invocation_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_fighting_styles {
   hero_id         BigInt
   style_id        BigInt
@@ -169,8 +158,6 @@ model hero_fighting_styles {
   @@id([hero_id, style_id])
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_items {
   hero_id BigInt
   item_id String
@@ -182,7 +169,6 @@ model hero_items {
   @@id([hero_id, item_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_levels {
   hero_id       BigInt
   class_id      Int         @db.SmallInt
@@ -197,8 +183,6 @@ model hero_levels {
   @@id([hero_id, class_id])
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_magic_items {
   hero_id       BigInt
   magic_item_id String
@@ -210,7 +194,6 @@ model hero_magic_items {
   @@id([hero_id, magic_item_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_skills {
   hero_id   BigInt
   skill_key String @id
@@ -218,7 +201,6 @@ model hero_skills {
   heroes    heroes @relation(fields: [hero_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_spellbook {
   hero_id  BigInt
   spell_id String
@@ -228,7 +210,6 @@ model hero_spellbook {
   @@id([hero_id, spell_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_spells {
   hero_id  BigInt
   spell_id String
@@ -240,7 +221,6 @@ model hero_spells {
   @@id([hero_id, spell_id, class_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_traits {
   hero_id  BigInt
   trait_id String
@@ -250,7 +230,6 @@ model hero_traits {
   @@id([hero_id, trait_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero_weapons {
   hero_id       BigInt
   weapon_id     String
@@ -267,7 +246,6 @@ model hero_weapons {
   @@id([id, hero_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model heroes {
   id                              BigInt                      @id @default(autoincrement())
   created_at                      DateTime                    @default(now()) @db.Timestamptz(6)
@@ -328,7 +306,6 @@ model heroes {
   worlds                          worlds                      @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model items {
   id          String  @id @default(uuid())
   name_rus    String
@@ -345,7 +322,6 @@ model items {
   worlds      worlds?      @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model magic_items {
   id                   String             @id(map: "magic_items_pkey1")
   name_rus             String
@@ -372,7 +348,6 @@ model magic_items {
   worlds               worlds?            @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model monsters {
   id                   BigInt           @id(map: "monster_pkey")
   name_rus             String?
@@ -409,7 +384,6 @@ model monsters {
   battle_members       battle_members[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profiles {
   id         String    @id @db.Uuid
   updated_at DateTime? @db.Timestamptz(6)
@@ -418,7 +392,6 @@ model profiles {
   master     Boolean
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model races {
   id          Int        @id @default(autoincrement()) @db.SmallInt
   name        String?
@@ -430,14 +403,12 @@ model races {
   subraces    subraces[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model rules {
   id          String @id
   name        String
   description String
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model spells {
   id                   String                 @id
   name_rus             String?
@@ -467,7 +438,6 @@ model spells {
   trait_spells         trait_spells[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model subclass_spells {
   subclass_id BigInt
   spell_id    String
@@ -477,7 +447,6 @@ model subclass_spells {
   @@id([subclass_id, spell_id], map: "subslass_spells_pkey")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model subclasses {
   id                   BigInt                 @id @default(autoincrement())
   name                 String
@@ -493,7 +462,6 @@ model subclasses {
   classes              classes                @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model subraces {
   id            Int        @id @default(autoincrement()) @db.SmallInt
   name          String
@@ -507,7 +475,6 @@ model subraces {
   races         races      @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model trait_spells {
   trait_id String
   spell_id String
@@ -517,7 +484,6 @@ model trait_spells {
   @@id([trait_id, spell_id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model traits {
   id           String         @id
   name_rus     String
@@ -530,7 +496,6 @@ model traits {
   trait_spells trait_spells[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model warlock_pacts {
   id          BigInt   @id @default(autoincrement())
   name        String
@@ -538,8 +503,6 @@ model warlock_pacts {
   heroes      heroes[]
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model weapons {
   id           String         @id
   name_rus     String
@@ -560,7 +523,6 @@ model weapons {
   worlds       worlds?        @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model worlds {
   id             BigInt           @id(map: "Worlds_pkey") @default(autoincrement())
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
