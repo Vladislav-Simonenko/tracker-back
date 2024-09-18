@@ -20,7 +20,6 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    // Проверка на уникальность email и логина
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ email: createUserDto.email }, { login: createUserDto.login }],
@@ -31,7 +30,6 @@ export class UsersService {
       throw new ConflictException('Email или логин уже заняты.');
     }
 
-    // Хеширование пароля
     const hashedPassword = await bcryptjs.hash(createUserDto.password, 10);
 
     try {
@@ -90,7 +88,6 @@ export class UsersService {
       throw new NotFoundException(`Пользователь с id ${id} не найден.`);
     }
 
-    // Проверка на уникальность email и логина
     if (updateUserDto.email || updateUserDto.login) {
       const userWithSameCredentials = await this.prisma.user.findFirst({
         where: {
