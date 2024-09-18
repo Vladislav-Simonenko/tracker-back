@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { GetItemByIdDto } from './dto/get-item-id.dto';
+import { GetItemDto } from './dto/get-item.dto';
 
 @Injectable()
 export class ItemService {
@@ -11,6 +13,7 @@ export class ItemService {
     return this.prisma.items.findMany();
   }
 
+  //NOTE: add DTO ef needed
   async getItemById(id: string) {
     const item = await this.prisma.items.findUnique({
       where: { id },
