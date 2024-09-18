@@ -7,6 +7,7 @@ import { ItemModule } from './items/item.module';
 import { UploadModule } from './upload/upload.module';
 import { HeroModule } from './heroes/heroes.module';
 import { WorldsModule } from './worlds/worlds.module';
+import { WeaponsModule } from './weapons/weapon.module';
 @Module({
   imports: [
     AuthModule,
@@ -15,6 +16,7 @@ import { WorldsModule } from './worlds/worlds.module';
     UploadModule,
     HeroModule,
     WorldsModule,
+    WeaponsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -504,7 +504,7 @@ model warlock_pacts {
 }
 
 model weapons {
-  id           String         @id
+  id           String         @id @default(uuid())
   name_rus     String
   name_eng     String
   type         Int            @db.SmallInt
