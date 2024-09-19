@@ -19,6 +19,7 @@ import { extname } from 'path';
 import { createHeroSchema } from './shema/create-hero.shema';
 import { updateHeroSchema } from './shema/update-hero.shema';
 
+@ApiTags('heroes')
 @Controller('heroes')
 export class HeroController {
   constructor(private readonly heroService: HeroService) {}

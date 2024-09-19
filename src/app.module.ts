@@ -6,8 +6,16 @@ import { UsersModule } from '@users/users.module';
 import { ItemModule } from './items/item.module';
 import { UploadModule } from './upload/upload.module';
 import { HeroModule } from './heroes/heroes.module';
+import { WorldsModule } from './worlds/worlds.module';
 @Module({
-  imports: [AuthModule, UsersModule, ItemModule, UploadModule, HeroModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    ItemModule,
+    UploadModule,
+    HeroModule,
+    WorldsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
