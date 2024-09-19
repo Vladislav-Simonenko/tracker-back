@@ -35,7 +35,7 @@ export class WeaponsController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './images',
+        destination: './images/weapons',
         filename: (req, file, cb) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -49,7 +49,7 @@ export class WeaponsController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: CreateWeaponDto,
   ) {
-    const iconPath = file ? `/images/${file.filename}` : null;
+    const iconPath = file ? `/images/weapons/${file.filename}` : null;
 
     const createWeaponDto: CreateWeaponDto = {
       ...body,
@@ -76,7 +76,7 @@ export class WeaponsController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './images',
+        destination: './images/weapons',
         filename: (req, file, cb) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -91,7 +91,7 @@ export class WeaponsController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UpdateWeaponDto,
   ) {
-    const iconPath = file ? `/images/${file.filename}` : null;
+    const iconPath = file ? `/images/weapons/${file.filename}` : null;
 
     const updateWeaponDto: UpdateWeaponDto = {
       ...body,
