@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   InternalServerErrorException,
   NotFoundException,
   Param,

@@ -404,7 +404,7 @@ model races {
 }
 
 model rules {
-  id          String @id
+  id          Int @id @default(autoincrement())
   name        String
   description String
 }

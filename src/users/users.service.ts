@@ -8,7 +8,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcryptjs from 'bcryptjs';
-import * as crypto from 'crypto';
 import { UserRole } from './dto/user-role.enum';
 import { AuthService } from '@auth/auth.service';
 
