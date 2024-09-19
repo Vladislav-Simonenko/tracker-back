@@ -8,6 +8,9 @@ import {
   Put,
   UploadedFile,
   UseInterceptors,
+  InternalServerErrorException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -25,13 +28,28 @@ export class HeroController {
   constructor(private readonly heroService: HeroService) {}
 
   @Get()
-  getAllHeroes() {
-    return this.heroService.getAllHeroes();
+  async getAllHeroes() {
+    try {
+      return await this.heroService.getAllHeroes();
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to retrieve heroes');
+    }
   }
 
   @Get(':id')
-  getHeroById(@Param('id') id: string) {
-    return this.heroService.getHeroById(Number(id));
+  async getHeroById(@Param('id') id: string) {
+    try {
+      const heroId = Number(id);
+      if (isNaN(heroId)) {
+        throw new BadRequestException('Invalid ID format');
+      }
+      return await this.heroService.getHeroById(heroId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error fetching hero data');
+    }
   }
 
   @Post()
@@ -102,7 +120,18 @@ export class HeroController {
   }
 
   @Delete(':id')
-  deleteHero(@Param('id') id: string) {
-    return this.heroService.deleteHero(Number(id));
+  async deleteHero(@Param('id') id: string) {
+    try {
+      const heroId = Number(id);
+      if (isNaN(heroId)) {
+        throw new BadRequestException('Invalid ID format');
+      }
+      return await this.heroService.deleteHero(heroId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to delete hero');
+    }
   }
 }

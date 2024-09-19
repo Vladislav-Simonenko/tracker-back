@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,23 +20,34 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcryptjs.hash(createUserDto.password, 10);
-
-    const user = await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        password: hashedPassword,
-        isVerified: true,
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: createUserDto.email }, { login: createUserDto.login }],
       },
     });
-    const loginDto = {
-      email: user.email,
-      password: createUserDto.password,
-    };
-    return {
-      message:
-        'Registration successful. Please check your email to verify your account.',
-    };
+
+    if (existingUser) {
+      throw new ConflictException('Email или логин уже заняты.');
+    }
+
+    const hashedPassword = await bcryptjs.hash(createUserDto.password, 10);
+
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          ...createUserDto,
+          password: hashedPassword,
+          isVerified: true,
+        },
+      });
+
+      return {
+        message:
+          'Регистрация успешна. Пожалуйста, проверьте вашу почту для верификации аккаунта.',
+      };
+    } catch (error) {
+      throw new BadRequestException('Ошибка при создании пользователя.');
+    }
   }
 
   async findAll() {
@@ -66,30 +82,70 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
+    const existingUser = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!existingUser) {
+      throw new NotFoundException(`Пользователь с id ${id} не найден.`);
+    }
+
+    if (updateUserDto.email || updateUserDto.login) {
+      const userWithSameCredentials = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: updateUserDto.email ?? existingUser.email },
+            { login: updateUserDto.login ?? existingUser.login },
+          ],
+          NOT: { id },
+        },
+      });
+
+      if (userWithSameCredentials) {
+        throw new ConflictException('Email или логин уже заняты.');
+      }
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await bcryptjs.hash(updateUserDto.password, 10);
     }
 
-    return this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+    try {
+      return this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    } catch (error) {
+      throw new BadRequestException('Ошибка при обновлении пользователя.');
+    }
   }
 
   async remove(id: string) {
     try {
-      return this.prisma.user.delete({
+      const deletedUser = await this.prisma.user.delete({
         where: { id },
       });
+
+      return deletedUser;
     } catch (error) {
-      return { message: 'the user could not be deleted.' };
+      throw new NotFoundException(
+        `Пользователь с id ${id} не найден или уже удален.`,
+      );
     }
   }
 
   async updateUserRole(id: string, role: UserRole) {
-    return this.prisma.user.update({
-      where: { id },
-      data: { role },
-    });
+    if (!Object.values(UserRole).includes(role)) {
+      throw new BadRequestException(
+        `Недопустимая роль. Допустимые роли: ${Object.values(UserRole).join(', ')}`,
+      );
+    }
+
+    try {
+      return this.prisma.user.update({
+        where: { id },
+        data: { role },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Пользователь с id ${id} не найден.`);
+    }
   }
 }
