@@ -53,14 +53,12 @@ export class CreateItemDto {
     description: 'Icon image of the item (file upload)',
     type: 'string',
     format: 'binary',
-    required: false,
   })
   icon?: string | null;
 
   @ApiProperty({
     description: 'World ID the item belongs to',
     example: 1,
-    required: false,
   })
   world_id?: number | null;
 }
