@@ -1,23 +1,25 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
-  Delete,
-  Put,
-  UploadedFile,
+  Post,
   UseInterceptors,
+  UploadedFile,
+  Body,
+  Put,
+  Delete,
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiConsumes, ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
-import { HeroService } from './heroes.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { createHeroSchema } from './shema/create-hero.shema';
 import { updateHeroSchema } from './shema/update-hero.shema';
+import { HeroService } from './heroes.service';
+import { generateFileName } from 'src/utils/file-utils';
+import { DeleteUserDto } from '@users/dto/delete-user.dto';
+import { DeleteHeroDto } from './dto/delete-hero.dto';
 
 @ApiTags('heroes')
 @Controller('heroes')
@@ -44,12 +46,7 @@ export class HeroController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './images/heroes',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          cb(null, `${uniqueSuffix}${ext}`);
-        },
+        filename: generateFileName,
       }),
     }),
   )
@@ -77,12 +74,7 @@ export class HeroController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './images/heroes',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          cb(null, `${uniqueSuffix}${ext}`);
-        },
+        filename: generateFileName,
       }),
     }),
   )
@@ -95,14 +87,15 @@ export class HeroController {
 
     const createHeroDto: UpdateHeroDto = {
       ...body,
-      image_url: imageUrl,
+      image_url: imageUrl || body.image_url,
     };
 
     return this.heroService.updateHero(id, createHeroDto);
   }
 
   @Delete(':id')
-  deleteHero(@Param('id') id: string) {
-    return this.heroService.deleteHero(Number(id));
+  @ApiOkResponse({ type: DeleteHeroDto })
+  deleteHero(@Param('id') params: DeleteUserDto) {
+    return this.heroService.deleteHero(Number(params.id));
   }
 }

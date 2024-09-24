@@ -13,7 +13,8 @@ export class CreateHeroDto {
   world_id: number;
   @ApiProperty({
     description: 'Hero owner',
-    example: 1,
+    example: 'string',
+    required: false,
   })
   user_id?: string;
   @ApiProperty({
@@ -48,7 +49,8 @@ export class CreateHeroDto {
   wis: number;
   @ApiProperty({
     description: 'Hero notes',
-    example: 1,
+    example: 'string',
+    required: false,
   })
   notes?: string;
   @ApiProperty({
@@ -60,7 +62,7 @@ export class CreateHeroDto {
     description: 'Hero armor_types_prof',
     example: ['string'],
   })
-  armor_types_prof: string[];
+  armor_types_prof: string | string[];
   @ApiProperty({
     description: 'Hero buff_hp',
     example: 1,
@@ -116,18 +118,20 @@ export class CreateHeroDto {
   @ApiProperty({
     description: 'Hero subrace_id',
     example: 1,
+    required: false,
   })
   subrace_id?: number;
   @ApiProperty({
     description: 'Hero race_id',
     example: 1,
+    required: false,
   })
   race_id?: number;
   @ApiProperty({
     description: 'Hero race_id',
     example: ['string'],
   })
-  weapon_types_prof: string[];
+  weapon_types_prof: string | string[];
   @ApiProperty({
     description: 'Hero creation_done',
     example: true,
@@ -136,56 +140,65 @@ export class CreateHeroDto {
   @ApiProperty({
     description: 'Hero traits',
     example: 'string',
+    required: false,
   })
   traits?: string;
   @ApiProperty({
-    description: 'Hero ideal',
+    description: 'Hero ideals',
     example: 'string',
+    required: false,
   })
-  ideal?: string;
+  ideals?: string;
   @ApiProperty({
     description: 'Hero bounds',
     example: 'string',
+    required: false,
   })
   bounds?: string;
   @ApiProperty({
     description: 'Hero flaws',
     example: 'string',
+    required: false,
   })
   flaws?: string;
   @ApiProperty({
     description: 'Hero languages_ids',
     example: [1],
   })
-  languages_ids: number[];
+  languages_ids: string | number[];
   @ApiProperty({
     description: 'Hero tools_ids',
     example: [1],
   })
-  tools_ids: number[];
+  tools_ids: string | number[];
   @ApiProperty({
     description: 'Hero armor_id',
     example: 1,
+    required: false,
   })
   armor_id?: number;
   @ApiProperty({
     description: 'Hero shield_id',
     example: 1,
+    required: false,
   })
   shield_id?: number;
   @ApiProperty({
     description: 'Hero armor_bonus',
     example: 1,
+    required: false,
   })
   armor_bonus?: number;
   @ApiProperty({
     description: 'Hero experience',
     example: 1,
+    required: false,
   })
   experience?: number;
   @ApiProperty({
     description: 'Hero warlock_pact_id',
     example: 1,
+    required: false,
   })
   warlock_pact_id?: number;
 }
