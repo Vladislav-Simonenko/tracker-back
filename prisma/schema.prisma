@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
+  id         String   @id @default(uuid())
   email      String   @unique
   fullname   String?
   password   String
@@ -298,18 +298,18 @@ model heroes {
   hero_spells                     hero_spells[]
   hero_traits                     hero_traits[]
   hero_weapons                    hero_weapons[]
-  languages                       languages[]                 
-  tools                           tools[]                     
   armors_heroes_armor_idToarmors  armors?                     @relation("heroes_armor_idToarmors", fields: [armor_id], references: [id], onUpdate: NoAction)
   races                           races?                      @relation(fields: [race_id], references: [id], onUpdate: NoAction)
   armors_heroes_shield_idToarmors armors?                     @relation("heroes_shield_idToarmors", fields: [shield_id], references: [id], onUpdate: NoAction)
   subraces                        subraces?                   @relation(fields: [subrace_id], references: [id], onUpdate: NoAction)
   warlock_pacts                   warlock_pacts?              @relation(fields: [warlock_pact_id], references: [id], onUpdate: NoAction)
   worlds                          worlds                      @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  languages                       languages[]                 @relation("heroesTolanguages")
+  tools                           tools[]                     @relation("heroesTotools")
 }
 
 model items {
-  id          String  @id @default(uuid())
+  id          String       @id @default(uuid())
   name_rus    String
   name_eng    String
   homebrew    Boolean
@@ -539,15 +539,15 @@ model worlds {
 }
 
 model languages {
-  id            Int        @id @default(autoincrement()) @db.SmallInt
-  name          String
-  heroes  heroes[]
+  id     Int      @id @default(autoincrement()) @db.SmallInt
+  name   String
+  heroes heroes[] @relation("heroesTolanguages")
 }
 
 model tools {
-  id            Int        @id @default(autoincrement()) @db.SmallInt
-  name          String
-  heroes  heroes[]
+  id     Int      @id @default(autoincrement()) @db.SmallInt
+  name   String
+  heroes heroes[] @relation("heroesTotools")
 }
 
 enum Role {
