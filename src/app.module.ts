@@ -7,6 +7,8 @@ import { HeroModule } from './heroes/heroes.module';
 import { RaceModule } from './races/race.module';
 import { TraitModule } from './traits/trait.module';
 import { FeatureModule } from './features/feature.module';
+import { LanguageModule } from './languages/language.model';
+import { ToolModule } from './tools/tool.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { FeatureModule } from './features/feature.module';
     RaceModule,
     TraitModule,
     FeatureModule,
+    LanguageModule,
+    ToolModule,
   ],
   controllers: [AppController],
   providers: [AppService],
