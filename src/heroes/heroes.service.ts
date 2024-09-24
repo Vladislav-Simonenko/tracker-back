@@ -8,6 +8,7 @@ import {
   parseBoolean,
   transformHeroDto,
 } from 'src/heroes/utils/hero-utils';
+import { bigintToJSON } from 'src/utils/bigint-transformer';
 
 @Injectable()
 export class HeroService {
@@ -15,7 +16,7 @@ export class HeroService {
 
   async getAllHeroes() {
     const heroes = await this.prisma.heroes.findMany();
-    return this.bigintToJSON(heroes);
+    return bigintToJSON(heroes);
   }
 
   async getHeroById(id: number) {
@@ -25,7 +26,7 @@ export class HeroService {
     if (!hero) {
       throw new NotFoundException(`Hero with ID ${id} not found`);
     }
-    return this.bigintToJSON(hero);
+    return bigintToJSON(hero);
   }
 
   async createHero(createHeroDto: CreateHeroDto) {
@@ -35,7 +36,7 @@ export class HeroService {
       data: transformedData,
     });
 
-    return this.bigintToJSON(newHero);
+    return bigintToJSON(newHero);
   }
 
   async updateHero(id: number, updateHeroDto: UpdateHeroDto) {
@@ -46,24 +47,16 @@ export class HeroService {
       data: transformedData,
     });
 
-    return this.bigintToJSON(updatedHero);
+    return bigintToJSON(updatedHero);
   }
 
   async deleteHero(id: number) {
     const deletedHero = await this.prisma.heroes.delete({
       where: { id },
     });
-    return this.bigintToJSON({
+    return bigintToJSON({
       message: `Hero with ID ${id} deleted`,
       deletedHero,
     });
-  }
-
-  bigintToJSON(obj: any) {
-    return JSON.parse(
-      JSON.stringify(obj, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value,
-      ),
-    );
   }
 }
