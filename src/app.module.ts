@@ -9,6 +9,7 @@ import { TraitModule } from './traits/trait.module';
 import { FeatureModule } from './features/feature.module';
 import { LanguageModule } from './languages/language.model';
 import { ToolModule } from './tools/tool.module';
+import { ItemModule } from './items/item.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ToolModule } from './tools/tool.module';
     FeatureModule,
     LanguageModule,
     ToolModule,
+    ItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
