@@ -298,6 +298,8 @@ model heroes {
   hero_spells                     hero_spells[]
   hero_traits                     hero_traits[]
   hero_weapons                    hero_weapons[]
+  languages                       languages[]                 
+  tools                           tools[]                     
   armors_heroes_armor_idToarmors  armors?                     @relation("heroes_armor_idToarmors", fields: [armor_id], references: [id], onUpdate: NoAction)
   races                           races?                      @relation(fields: [race_id], references: [id], onUpdate: NoAction)
   armors_heroes_shield_idToarmors armors?                     @relation("heroes_shield_idToarmors", fields: [shield_id], references: [id], onUpdate: NoAction)
@@ -534,6 +536,18 @@ model worlds {
   items          items[]
   magic_items    magic_items[]
   weapons        weapons[]
+}
+
+model languages {
+  id            Int        @id @default(autoincrement()) @db.SmallInt
+  name          String
+  heroes  heroes[]
+}
+
+model tools {
+  id            Int        @id @default(autoincrement()) @db.SmallInt
+  name          String
+  heroes  heroes[]
 }
 
 enum Role {
