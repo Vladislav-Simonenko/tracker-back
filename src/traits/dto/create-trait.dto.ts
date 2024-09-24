@@ -40,5 +40,3 @@ export class CreateTraitDto {
   })
   homebrew: boolean;
 }
-
-export class UpdateTraitDto extends CreateTraitDto {}
