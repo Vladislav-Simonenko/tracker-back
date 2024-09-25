@@ -13,7 +13,7 @@ import { CreateWorldDto } from './dto/create-world.dto';
 import { UpdateWorldDto } from './dto/update-world.dto';
 
 @ApiTags('worlds')
-@Controller('worlds')
+@Controller('/api/worlds')
 export class WorldController {
   constructor(private readonly worldsService: WorldService) {}
 

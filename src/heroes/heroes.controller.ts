@@ -22,7 +22,7 @@ import { DeleteUserDto } from '@users/dto/delete-user.dto';
 import { DeleteHeroDto } from './dto/delete-hero.dto';
 
 @ApiTags('heroes')
-@Controller('heroes')
+@Controller('/api/heroes')
 export class HeroController {
   constructor(private readonly heroService: HeroService) {}
 

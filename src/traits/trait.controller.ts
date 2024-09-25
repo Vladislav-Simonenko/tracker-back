@@ -13,7 +13,7 @@ import { UpdateTraitDto } from './dto/update-trait.dto';
 import { ApiTags, ApiOkResponse, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('traits')
-@Controller('traits')
+@Controller('/api/traits')
 export class TraitController {
   constructor(private readonly traitsService: TraitService) {}
 
