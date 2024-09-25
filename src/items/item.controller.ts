@@ -81,7 +81,7 @@ export class ItemController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './images',
+        destination: './images/items',
         filename: generateFileName,
       }),
     }),
@@ -91,7 +91,7 @@ export class ItemController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UpdateItemDto,
   ) {
-    const iconPath = file ? `/images/${file.filename}` : null;
+    const iconPath = file ? `/images/weapons/${file.filename}` : null;
 
     const updateItemDto: UpdateItemDto = {
       ...body,

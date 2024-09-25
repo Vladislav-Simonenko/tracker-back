@@ -11,6 +11,7 @@ import { LanguageModule } from './languages/language.model';
 import { ToolModule } from './tools/tool.module';
 import { ItemModule } from './items/item.module';
 import { WorldModule } from './worlds/world.module';
+import { WeaponModule } from './weapons/weapon.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { WorldModule } from './worlds/world.module';
     ToolModule,
     ItemModule,
     WorldModule,
+    WeaponModule,
   ],
   controllers: [AppController],
   providers: [AppService],
