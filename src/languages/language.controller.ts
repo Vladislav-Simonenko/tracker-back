@@ -14,7 +14,7 @@ import { UpdateLanguageDto } from './dto/update-language.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('languages')
-@Controller('languages')
+@Controller('/api/languages')
 export class LanguageController {
   constructor(private readonly languageService: LanguageService) {}
 

@@ -12,6 +12,7 @@ import { ToolModule } from './tools/tool.module';
 import { ItemModule } from './items/item.module';
 import { WorldModule } from './worlds/world.module';
 import { WeaponModule } from './weapons/weapon.module';
+import { RuleModule } from './rules/rule.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { WeaponModule } from './weapons/weapon.module';
     ItemModule,
     WorldModule,
     WeaponModule,
+    RuleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

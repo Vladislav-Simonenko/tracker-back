@@ -13,7 +13,7 @@ import { ApiTags, ApiOkResponse, ApiBody } from '@nestjs/swagger';
 import { FeatureService } from './feature.service';
 
 @ApiTags('features')
-@Controller('features')
+@Controller('/api/features')
 export class FeatureController {
   constructor(private readonly featuresService: FeatureService) {}
 

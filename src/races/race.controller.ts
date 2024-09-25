@@ -19,7 +19,7 @@ import { diskStorage } from 'multer';
 import { generateFileName } from 'src/utils/file-utils';
 
 @ApiTags('races')
-@Controller('races')
+@Controller('/api/races')
 export class RaceController {
   constructor(private readonly raceService: RaceService) {}
 
