@@ -43,7 +43,7 @@ export class ArmorController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: '.images/armors',
+        destination: './images/armors',
         filename: generateFileName,
       }),
     }),
