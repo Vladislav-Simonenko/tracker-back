@@ -7,7 +7,7 @@ export class CreateRaceDto {
   })
   name?: string;
   @ApiProperty({
-    description: 'Race name',
+    description: 'Race icon',
     type: 'string',
     format: 'binary',
   })
