@@ -15,6 +15,7 @@ import { WeaponModule } from './weapons/weapon.module';
 import { RuleModule } from './rules/rule.module';
 import { ClassModule } from './classes/class.module';
 import { MonsterModule } from './monsters/monster.module';
+import { ArmorModule } from './armor/armor.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MonsterModule } from './monsters/monster.module';
     RuleModule,
     ClassModule,
     MonsterModule,
+    ArmorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

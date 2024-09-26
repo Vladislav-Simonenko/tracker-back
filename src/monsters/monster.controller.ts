@@ -1,4 +1,3 @@
-// monster.controller.ts
 import {
   Controller,
   Get,
@@ -12,8 +11,10 @@ import {
 import { MonsterService } from './monster.service';
 import { CreateMonsterDto } from './dto/create-monster.dto';
 import { UpdateMonsterDto } from './dto/update-monster.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('monsters')
+@ApiTags('monsters')
+@Controller('/api/monsters')
 export class MonsterController {
   constructor(private readonly monsterService: MonsterService) {}
 
