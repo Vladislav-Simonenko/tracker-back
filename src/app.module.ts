@@ -18,6 +18,7 @@ import { MonsterModule } from './monsters/monster.module';
 import { ArmorModule } from './armor/armor.module';
 import { InvocationModule } from './eldritch_invocations/invocation.module';
 import { MitemModule } from './magic-items/mitem.module';
+import { ApsModule } from './auto-prepared-spells/aps.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { MitemModule } from './magic-items/mitem.module';
     ArmorModule,
     InvocationModule,
     MitemModule,
+    ApsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
