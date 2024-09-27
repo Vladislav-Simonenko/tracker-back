@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateItemDto {
   @ApiProperty({
-    description: 'Hero name in Russian',
+    description: 'Item name in Russian',
     example: 'string',
   })
   name_rus: string;
   @ApiProperty({
-    description: 'Hero name in English',
+    description: 'Item name in English',
     example: 'string',
   })
   name_eng: string;

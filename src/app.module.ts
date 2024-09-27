@@ -17,6 +17,7 @@ import { ClassModule } from './classes/class.module';
 import { MonsterModule } from './monsters/monster.module';
 import { ArmorModule } from './armor/armor.module';
 import { InvocationModule } from './eldritch_invocations/invocation.module';
+import { MitemModule } from './magic-items/mitem.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { InvocationModule } from './eldritch_invocations/invocation.module';
     MonsterModule,
     ArmorModule,
     InvocationModule,
+    MitemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
