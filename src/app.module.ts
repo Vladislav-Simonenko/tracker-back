@@ -20,6 +20,7 @@ import { InvocationModule } from './eldritch_invocations/invocation.module';
 import { MitemModule } from './magic-items/mitem.module';
 import { ApsModule } from './auto-prepared-spells/aps.module';
 import { WpModule } from './warlock_pacts/wp.module';
+import { BmModule } from './battle-members/bm.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { WpModule } from './warlock_pacts/wp.module';
     MitemModule,
     ApsModule,
     WpModule,
+    BmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
