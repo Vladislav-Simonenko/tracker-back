@@ -16,6 +16,7 @@ import { RuleModule } from './rules/rule.module';
 import { ClassModule } from './classes/class.module';
 import { MonsterModule } from './monsters/monster.module';
 import { ArmorModule } from './armor/armor.module';
+import { InvocationModule } from './eldritch_invocations/invocation.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ArmorModule } from './armor/armor.module';
     ClassModule,
     MonsterModule,
     ArmorModule,
+    InvocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
