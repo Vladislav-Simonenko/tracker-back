@@ -3,9 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
-  InternalServerErrorException,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -14,11 +11,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ItemService } from './item.service';
-import { ApiTags, ApiBody, ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { createItemSchema } from './schema/create-item.schema';
 import { updateItemShema } from './schema/update-item.schema';
 import { generateFileName } from 'src/utils/file-utils';
@@ -33,7 +29,7 @@ export class ItemController {
   }
 
   @Get(':id')
-  getHeroById(@Param('id') id: string) {
+  getItemById(@Param('id') id: string) {
     return this.itemService.getItemById(id);
   }
 
@@ -91,7 +87,7 @@ export class ItemController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UpdateItemDto,
   ) {
-    const iconPath = file ? `/images/weapons/${file.filename}` : null;
+    const iconPath = file ? `/images/items/${file.filename}` : null;
 
     const updateItemDto: UpdateItemDto = {
       ...body,
