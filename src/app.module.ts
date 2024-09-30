@@ -21,6 +21,7 @@ import { MitemModule } from './magic-items/mitem.module';
 import { ApsModule } from './auto-prepared-spells/aps.module';
 import { WpModule } from './warlock_pacts/wp.module';
 import { BmModule } from './battle-members/bm.module';
+import { ClassSpellsModule } from './class-spells/cs.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { BmModule } from './battle-members/bm.module';
     ApsModule,
     WpModule,
     BmModule,
+    ClassSpellsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
