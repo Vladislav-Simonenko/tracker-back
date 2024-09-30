@@ -23,6 +23,7 @@ import { WpModule } from './warlock_pacts/wp.module';
 import { BmModule } from './battle-members/bm.module';
 import { ClassSpellsModule } from './class-spells/cs.module';
 import { SpellModule } from './spells/spell.module';
+import { FsModule } from './fighting-styles/fs.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { SpellModule } from './spells/spell.module';
     BmModule,
     ClassSpellsModule,
     SpellModule,
+    FsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
