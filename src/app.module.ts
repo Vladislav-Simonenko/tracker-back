@@ -22,6 +22,7 @@ import { ApsModule } from './auto-prepared-spells/aps.module';
 import { WpModule } from './warlock_pacts/wp.module';
 import { BmModule } from './battle-members/bm.module';
 import { ClassSpellsModule } from './class-spells/cs.module';
+import { SpellModule } from './spells/spell.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ClassSpellsModule } from './class-spells/cs.module';
     WpModule,
     BmModule,
     ClassSpellsModule,
+    SpellModule,
   ],
   controllers: [AppController],
   providers: [AppService],
