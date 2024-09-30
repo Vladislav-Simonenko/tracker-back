@@ -18,7 +18,7 @@ export class WorldService {
       where: { id },
     });
     if (!world) {
-      throw new NotFoundException('World with ID ${id} not found');
+      throw new NotFoundException(`World with ID ${id} not found`);
     }
     return bigintToJSON(world);
   }
