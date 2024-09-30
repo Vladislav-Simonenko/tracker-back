@@ -23,6 +23,11 @@ import { WpModule } from './warlock_pacts/wp.module';
 import { BmModule } from './battle-members/bm.module';
 import { ClassSpellsModule } from './class-spells/cs.module';
 import { SpellModule } from './spells/spell.module';
+<<<<<<< Updated upstream
+=======
+import { FsModule } from './fighting-styles/fs.module';
+import { SsModule } from './subclass-spells/ss.module';
+>>>>>>> Stashed changes
 
 @Module({
   imports: [
@@ -48,6 +53,11 @@ import { SpellModule } from './spells/spell.module';
     BmModule,
     ClassSpellsModule,
     SpellModule,
+<<<<<<< Updated upstream
+=======
+    FsModule,
+    SsModule,
+>>>>>>> Stashed changes
   ],
   controllers: [AppController],
   providers: [AppService],
