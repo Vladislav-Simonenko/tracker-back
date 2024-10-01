@@ -52,7 +52,7 @@ export class ArmorController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: CreateArmorDto,
   ) {
-    const iconPath = file ? `/images/weapons/${file.filename}` : '';
+    const iconPath = file ? `/images/armors/${file.filename}` : '';
 
     const createArmorDto: CreateArmorDto = {
       ...body,

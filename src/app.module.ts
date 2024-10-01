@@ -25,6 +25,7 @@ import { ClassSpellsModule } from './class-spells/cs.module';
 import { SpellModule } from './spells/spell.module';
 import { FsModule } from './fighting-styles/fs.module';
 import { SsModule } from './subclass-spells/ss.module';
+import { SubraceModule } from './subraces/subraces.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { SsModule } from './subclass-spells/ss.module';
     SpellModule,
     FsModule,
     SsModule,
+    SubraceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
