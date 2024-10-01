@@ -24,6 +24,7 @@ import { BmModule } from './battle-members/bm.module';
 import { ClassSpellsModule } from './class-spells/cs.module';
 import { SpellModule } from './spells/spell.module';
 import { FsModule } from './fighting-styles/fs.module';
+import { SsModule } from './subclass-spells/ss.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { FsModule } from './fighting-styles/fs.module';
     ClassSpellsModule,
     SpellModule,
     FsModule,
+    SsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
