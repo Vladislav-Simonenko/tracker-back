@@ -59,6 +59,6 @@ export class SsController {
     @Param('subclass_id') subclass_id: number,
     @Param('spell_id') spell_id: string,
   ) {
-    await this.ssService.deleteSs(subclass_id, spell_id);
+    return await this.ssService.deleteSs(subclass_id, spell_id);
   }
 }
