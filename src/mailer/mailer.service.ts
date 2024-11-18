@@ -1,27 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer'; // Импортируем MailerService
-import { join } from 'path'; // Для работы с путями
+import { MailerService } from '@nestjs-modules/mailer';
+import { join } from 'path';
+
+const EMAIL_SUBJECT = 'Завершение регистрации в DnD Tracker.';
+const TEMPLATE_PATH = join(
+  __dirname,
+  '..',
+  'mailer',
+  'templates',
+  'conformation',
+);
 
 @Injectable()
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  // Метод для отправки email
-  async sendEmail(
-    to: string,
-    subject: string,
-    message: string,
-    url: string,
-  ): Promise<{ message: string }> {
+  async sendEmail({
+    to,
+    subject,
+    message,
+    url,
+  }: {
+    to: string;
+    subject: string;
+    message: string;
+    url: string;
+  }): Promise<{ message: string }> {
     try {
       await this.mailerService.sendMail({
-        to, // Адрес получателя
-        subject, // Тема письма
-        text: message, // Текст письма
-        template: join(__dirname, '..', 'mailer', 'templates', 'conformation'), // Правильный путь к шаблону
+        to,
+        subject: EMAIL_SUBJECT,
+        text: message,
+        template: TEMPLATE_PATH,
         context: {
-          name: to, // Пример: получатель
-          url, // Пример: ссылка для подтверждения
+          subject,
+          message,
+          url,
         },
       });
 

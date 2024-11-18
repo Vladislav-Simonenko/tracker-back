@@ -4,7 +4,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcryptjs from 'bcryptjs';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -21,12 +20,22 @@ export class AuthService {
 
   async sendEmail(
     to: string,
-    subject: string,
-    message: string,
+    subject?: string,
+    message?: string,
   ): Promise<{ message: string }> {
     const user = await this.prisma.user.findUnique({ where: { email: to } });
 
-    return this.mailService.sendEmail(to, subject, message, 'test');
+    await this.prisma.user.update({
+      where: { id: user!.id },
+      data: { isVerified: true },
+    });
+
+    return this.mailService.sendEmail({
+      to: user!.email,
+      subject: `Привет, ${user!.login}, регистрация завершена в ручную! ${subject}`,
+      message: `Регистрация завершена в ручную, с помощью админа. Перейди по ссылке ниже, что бы получить доступ к гуглу.${message}`,
+      url: 'https://www.google.com/',
+    });
   }
 
   async register(
@@ -41,7 +50,7 @@ export class AuthService {
         password: hashedPassword,
         login,
         role: 'USER',
-        isVerified: true,
+        isVerified: false,
       },
     });
 
@@ -49,19 +58,21 @@ export class AuthService {
       { sub: user.id, email: user.email },
       { expiresIn: '1h' },
     );
-    this.mailService.sendEmail(
-      user.email,
-      'Подтверждение регистрации',
-      'Подтверите регистацию через токен',
-      verificationToken,
-    );
+    //@FIXME: for local dev
+    const verificationLink = `http://localhost:3000/api/auth/verify?token=${verificationToken}`;
+
+    await this.mailService.sendEmail({
+      to: user.email,
+      subject: `Привет, ${user.login}, осталось только завершить регистрацию!`,
+      message: 'Чтобы завершить регистрацию, перейди по ссылке ниже.',
+      url: verificationLink,
+    });
 
     return {
       message:
-        'Registration successful. Please check your email to verify your account.',
+        'Регистрация успешна. Пожалуйста, проверьте свой почтовый ящик для подтверждения адреса электронной почты.',
     };
   }
-
   async verifyEmail(token: string): Promise<{ message: string }> {
     try {
       const payload = this.jwtService.verify(token);
@@ -71,11 +82,11 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('User not found.');
+        throw new UnauthorizedException('Пользователь не найден.');
       }
 
       if (user.isVerified) {
-        return { message: 'Email already verified.' };
+        return { message: 'Email уже подтвержден.' };
       }
 
       await this.prisma.user.update({
@@ -83,9 +94,11 @@ export class AuthService {
         data: { isVerified: true },
       });
 
-      return { message: 'Email successfully verified.' };
+      return { message: 'Email успешно подтвержден.' };
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired verification token.');
+      throw new UnauthorizedException(
+        'Неверный или просроченный токен подтверждения.',
+      );
     }
   }
 

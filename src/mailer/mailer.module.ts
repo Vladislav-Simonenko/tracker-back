@@ -5,24 +5,26 @@ import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { MailService } from './mailer.service';
 
+const TEMPLATE_PATH = join(__dirname, 'templates', 'conformation');
+
 @Module({
   imports: [
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
-          host: config.get('MAIL_HOST'), // smtp.yandex.ru
-          port: 465, // или 587 для TLS
-          secure: true, // используем secure: true для порта 465 (SSL)
+          host: config.get('MAIL_HOST'),
+          port: 465,
+          secure: true,
           auth: {
             user: config.get('MAIL_USER'),
             pass: config.get('MAIL_PASSWORD'),
           },
         },
         defaults: {
-          from: `"No Reply" <${config.get('MAIL_FROM')}>`, // настройка отправителя
+          from: `"No Reply" <${config.get('MAIL_FROM')}>`,
         },
         template: {
-          template: join(__dirname, 'templates', 'conformation'), // Путь к шаблону
+          template: TEMPLATE_PATH,
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
