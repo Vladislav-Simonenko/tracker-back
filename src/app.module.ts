@@ -28,10 +28,10 @@ import { SsModule } from './subclass-spells/ss.module';
 import { SubraceModule } from './subraces/subraces.module';
 import { SubclassModule } from './subclasses/subclass.module';
 import { TsModule } from './trait-spells/ts.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    AuthModule,
     UsersModule,
     HeroModule,
     RaceModule,
@@ -58,7 +58,12 @@ import { TsModule } from './trait-spells/ts.module';
     SubraceModule,
     SubclassModule,
     TsModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // no need to import into other modules
+    }),
+    AuthModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })

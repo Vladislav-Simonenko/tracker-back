@@ -6,18 +6,28 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
-// import { MailerService } from 'src/mailer/mailer.service';
 import * as bcryptjs from 'bcryptjs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { MailService } from '@mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private prisma: PrismaService,
-    // private mailerService: MailerService,
+    private mailService: MailService,
   ) {}
+
+  async sendEmail(
+    to: string,
+    subject: string,
+    message: string,
+  ): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email: to } });
+
+    return this.mailService.sendEmail(to, subject, message, 'test');
+  }
 
   async register(
     email: string,
@@ -35,13 +45,16 @@ export class AuthService {
       },
     });
 
-    // const verificationToken = await this.jwtService.signAsync(
-    //   { sub: user.id, email: user.email },
-    //   { expiresIn: '1h' },
-    // );
-
-    // NOTE: Отправляем verificationToken по email
-    // await this.mailerService.sendVerificationEmail(user.email, verificationToken);
+    const verificationToken = await this.jwtService.signAsync(
+      { sub: user.id, email: user.email },
+      { expiresIn: '1h' },
+    );
+    this.mailService.sendEmail(
+      user.email,
+      'Подтверждение регистрации',
+      'Подтверите регистацию через токен',
+      verificationToken,
+    );
 
     return {
       message:

@@ -3,9 +3,8 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-// import { MailerModule } from '@nestjs-modules/mailer'; // добавьте MailerModule
-// import { MailerService } from '../mailer/mailer.service'; // добавьте MailerService
 import { PrismaService } from 'src/prisma/prisma.service';
+import { MailModule } from '@mailer/mailer.module';
 
 @Module({
   imports: [
@@ -15,12 +14,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '15m' },
     }),
-    // NOTE
-    // MailerModule.forRoot({
-    // Настройте параметры MailerModule в зависимости от используемой почтовой службы
-    // }),
+    MailModule,
   ],
-  providers: [AuthService, PrismaService], //MailerService не забыть
+  providers: [AuthService, PrismaService],
   controllers: [AuthController],
   exports: [AuthService],
 })

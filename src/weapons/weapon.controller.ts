@@ -106,6 +106,7 @@ export class WeaponController {
 
     return this.weaponService.updateWeapon(id, updateWeaponDto);
   }
+
   @Delete(':id')
   async deleteWeapon(@Param('id') id: string) {
     return await this.weaponService.deleteWeapon(id);
