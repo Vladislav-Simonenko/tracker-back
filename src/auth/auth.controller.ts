@@ -18,7 +18,13 @@ import {
   ResetPasswordDto,
   RefreshTokenDto,
 } from './dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { SendEmailDto } from './dto/send-email.dto';
 
 @ApiTags('auth')
 @Controller('/api/auth')
@@ -32,6 +38,28 @@ export class AuthController {
     return this.authService.register(body.email, body.password, body.login);
   }
 
+  @ApiOperation({ summary: 'Отправка письма на указанный email' }) // Описание действия
+  @ApiResponse({
+    status: 200,
+    description: 'Сообщение отправлено успешно',
+    schema: {
+      example: { message: 'Сообщение отправлено успешно' }, // Пример успешного ответа
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Ошибка при отправке сообщения',
+    schema: {
+      example: { message: 'Ошибка при отправке сообщения' }, // Пример ошибки
+    },
+  })
+  @Post('send-email')
+  async sendEmail(
+    @Body() body: SendEmailDto, // Используем DTO
+  ) {
+    const { to, subject, message } = body;
+    return this.authService.sendEmail(to, subject, message);
+  }
   @Get('verify')
   async verifyEmail(@Query('token') token: string) {
     return this.authService.verifyEmail(token);

@@ -1,19 +1,48 @@
-// FIXME: появится позже
-// import { Injectable } from '@nestjs/common';
-// import { MailerService as NestMailerService } from '@nestjs-modules/mailer';
+import { Injectable } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
+import { join } from 'path';
 
-// @Injectable()
-// export class MailerService {
-//   constructor(private mailerService: NestMailerService) {}
+const EMAIL_SUBJECT = 'Завершение регистрации в DnD Tracker.';
+const TEMPLATE_PATH = join(
+  __dirname,
+  '..',
+  'mailer',
+  'templates',
+  'conformation',
+);
 
-//   async sendVerificationEmail(email: string, token: string) {
-//     const url = `http://localhost:4000/auth/verify?token=${token}`;
+@Injectable()
+export class MailService {
+  constructor(private readonly mailerService: MailerService) {}
 
-//     await this.mailerService.sendMail({
-//       to: email,
-//       subject: 'Verify your email',
-//       template: './verification',
-//       context: { url },
-//     });
-//   }
-// }
+  async sendEmail({
+    to,
+    subject,
+    message,
+    url,
+  }: {
+    to: string;
+    subject: string;
+    message: string;
+    url: string;
+  }): Promise<{ message: string }> {
+    try {
+      await this.mailerService.sendMail({
+        to,
+        subject: EMAIL_SUBJECT,
+        text: message,
+        template: TEMPLATE_PATH,
+        context: {
+          subject,
+          message,
+          url,
+        },
+      });
+
+      return { message: 'Сообщение отправлено успешно' };
+    } catch (error) {
+      console.error('Ошибка при отправке сообщения:', error);
+      throw new Error('Ошибка при отправке сообщения');
+    }
+  }
+}
