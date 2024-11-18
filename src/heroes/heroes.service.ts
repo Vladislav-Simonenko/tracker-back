@@ -2,12 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
-import {
-  parseArray,
-  parseNumberArray,
-  parseBoolean,
-  transformHeroDto,
-} from 'src/heroes/utils/hero-utils';
+import { transformHeroDto } from 'src/heroes/utils/hero-utils';
 import { bigintToJSON } from 'src/utils/bigint-transformer';
 
 @Injectable()

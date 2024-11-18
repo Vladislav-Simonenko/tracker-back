@@ -10,7 +10,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiConsumes, ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+  ApiOkResponse,
+  ApiParam,
+} from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
@@ -20,6 +26,7 @@ import { HeroService } from './heroes.service';
 import { generateFileName } from 'src/utils/file-utils';
 import { DeleteUserDto } from '@users/dto/delete-user.dto';
 import { DeleteHeroDto } from './dto/delete-hero.dto';
+import { GetHeroByIdDto } from './dto/get-hero-id.dto';
 
 @ApiTags('heroes')
 @Controller('/api/heroes')
@@ -32,10 +39,16 @@ export class HeroController {
   }
 
   @Get(':id')
-  getHeroById(@Param('id') id: string) {
-    return this.heroService.getHeroById(Number(id));
+  @ApiParam({
+    name: 'id',
+    description: 'ID героя',
+    required: true,
+    type: Number,
+  })
+  @ApiOkResponse({ type: GetHeroByIdDto })
+  getHeroById(@Param('id') id: number) {
+    return this.heroService.getHeroById(id);
   }
-
   @Post()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -67,17 +80,10 @@ export class HeroController {
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: 'Create hero with an image',
+    description: 'Обновить героя с изображением',
     schema: updateHeroSchema,
   })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './images/heroes',
-        filename: generateFileName,
-      }),
-    }),
-  )
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
   async updateHero(
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
@@ -85,17 +91,18 @@ export class HeroController {
   ) {
     const imageUrl = file ? `/images/heroes/${file.filename}` : null;
 
-    const createHeroDto: UpdateHeroDto = {
+    const updateHeroDto: UpdateHeroDto = {
       ...body,
       image_url: imageUrl || body.image_url,
     };
 
-    return this.heroService.updateHero(id, createHeroDto);
+    return this.heroService.updateHero(id, updateHeroDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: DeleteHeroDto })
-  deleteHero(@Param('id') params: DeleteUserDto) {
-    return this.heroService.deleteHero(Number(params.id));
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  deleteHero(@Param('id') id: number) {
+    return this.heroService.deleteHero(id);
   }
 }
