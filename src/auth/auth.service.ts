@@ -32,8 +32,8 @@ export class AuthService {
 
     return this.mailService.sendEmail({
       to: user!.email,
-      subject: `Привет, ${user!.login}, регистрация завершена в ручную! ${subject}`,
-      message: `Регистрация завершена в ручную, с помощью админа. Перейди по ссылке ниже, что бы получить доступ к гуглу.${message}`,
+      subject: `Привет, ${user!.login}, регистрация завершена вручную! ${subject}`,
+      message: `Регистрация завершена вручную, с помощью админа. Перейди по ссылке ниже, что бы получить доступ к гуглу.${message}`,
       url: 'https://www.google.com/',
     });
   }
