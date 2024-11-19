@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
+  id         String   @id @default(uuid()) @db.Uuid
   email      String   @unique
   fullname   String?
   password   String
@@ -17,6 +17,8 @@ model User {
   isVerified Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  heroes     heroes[] 
 
   @@map("user")
 }
@@ -306,6 +308,11 @@ model heroes {
   worlds                          worlds                      @relation(fields: [world_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   languages                       languages[]                 @relation("heroesTolanguages")
   tools                           tools[]                     @relation("heroesTotools")
+
+  user                            User?                       @relation(fields: [user_id], references: [id])
+
+  @@map("heroes")
+
 }
 
 model items {

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetHeroByIdDto {
+export class GetHeroDto {
   @ApiProperty()
   id: bigint;
 

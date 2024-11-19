@@ -24,7 +24,6 @@ import { createHeroSchema } from './schema/create-hero.schema';
 import { updateHeroSchema } from './schema/update-hero.schema';
 import { HeroService } from './heroes.service';
 import { generateFileName } from 'src/utils/file-utils';
-import { DeleteUserDto } from '@users/dto/delete-user.dto';
 import { DeleteHeroDto } from './dto/delete-hero.dto';
 import { GetHeroByIdDto } from './dto/get-hero-id.dto';
 

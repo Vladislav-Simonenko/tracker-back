@@ -4,10 +4,14 @@ import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { transformHeroDto } from 'src/heroes/utils/hero-utils';
 import { bigintToJSON } from 'src/utils/bigint-transformer';
+import { HeroesGateway } from './heroes.gateway'; // Подключаем HeroesGateway
 
 @Injectable()
 export class HeroService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private heroesGateway: HeroesGateway, // Инжектим HeroesGateway
+  ) {}
 
   async getAllHeroes() {
     const heroes = await this.prisma.heroes.findMany();
@@ -31,6 +35,9 @@ export class HeroService {
       data: transformedData,
     });
 
+    // Отправляем обновления через WebSocket
+    this.heroesGateway.server.emit('heroesUpdated', await this.getAllHeroes());
+
     return bigintToJSON(newHero);
   }
 
@@ -42,6 +49,9 @@ export class HeroService {
       data: transformedData,
     });
 
+    // Отправляем обновления через WebSocket
+    this.heroesGateway.server.emit('heroesUpdated', await this.getAllHeroes());
+
     return bigintToJSON(updatedHero);
   }
 
@@ -49,6 +59,10 @@ export class HeroService {
     const deletedHero = await this.prisma.heroes.delete({
       where: { id },
     });
+
+    // Отправляем обновления через WebSocket
+    this.heroesGateway.server.emit('heroesUpdated', await this.getAllHeroes());
+
     return bigintToJSON({
       message: `Hero with ID ${id} deleted`,
       deletedHero,

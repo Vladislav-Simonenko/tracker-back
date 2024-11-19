@@ -26,6 +26,7 @@ export function transformHeroDto(heroDto: CreateHeroDto | UpdateHeroDto) {
   return {
     name: heroDto.name,
     armorBonus: Number(heroDto.armorBonus),
+    user_id: heroDto.user_id,
     wis: Number(heroDto.wis),
     con: Number(heroDto.con),
     max_hp: Number(heroDto.max_hp),
