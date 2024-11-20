@@ -8,6 +8,8 @@ import {
   Body,
   Put,
   Delete,
+  ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -83,18 +85,34 @@ export class HeroController {
     schema: updateHeroSchema,
   })
   @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './images/heroes',
+        filename: generateFileName,
+      }),
+    }),
+  )
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async updateHero(
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UpdateHeroDto,
   ) {
-    const imageUrl = file ? `/images/heroes/${file.filename}` : null;
+    console.log('Received Body:', body);
+    console.log(
+      'Image URL:',
+      file ? `/images/heroes/${file.filename}` : 'No file uploaded',
+    );
+
+    const imageUrl = file ? `/images/heroes/${file.filename}` : body.image_url;
 
     const updateHeroDto: UpdateHeroDto = {
       ...body,
-      image_url: imageUrl || body.image_url,
+      image_url: imageUrl,
     };
 
+    console.log('Full Request:', { body, file });
     return this.heroService.updateHero(id, updateHeroDto);
   }
 

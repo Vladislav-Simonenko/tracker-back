@@ -21,6 +21,17 @@ export class HeroService {
   async getHeroById(id: number) {
     const hero = await this.prisma.heroes.findUnique({
       where: { id },
+      include: {
+        armors_heroes_armor_idToarmors: true,
+        races: true,
+        armors_heroes_shield_idToarmors: true,
+        subraces: true,
+        warlock_pacts: true,
+        worlds: true,
+        languages: true,
+        tools: true,
+        user: true,
+      },
     });
     if (!hero) {
       throw new NotFoundException(`Hero with ID ${id} not found`);
@@ -42,8 +53,19 @@ export class HeroService {
   }
 
   async updateHero(id: number, updateHeroDto: UpdateHeroDto) {
+    // Сначала проверим, существует ли герой с таким id
+    const existingHero = await this.prisma.heroes.findUnique({
+      where: { id },
+    });
+
+    if (!existingHero) {
+      throw new NotFoundException(`Hero with ID ${id} not found`);
+    }
+
+    // Преобразуем данные для обновления
     const transformedData = transformHeroDto(updateHeroDto);
 
+    // Обновляем данные героя
     const updatedHero = await this.prisma.heroes.update({
       where: { id },
       data: transformedData,

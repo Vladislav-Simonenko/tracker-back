@@ -28,5 +28,5 @@ export class GetUserDto {
   updatedAt: Date;
 
   @ApiProperty({ type: [GetHeroDto] })
-  heroes: GetHeroDto[]; // Включаем героев
+  heroes: GetHeroDto[];
 }
