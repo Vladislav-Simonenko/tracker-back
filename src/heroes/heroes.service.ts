@@ -4,13 +4,13 @@ import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { transformHeroDto } from 'src/heroes/utils/hero-utils';
 import { bigintToJSON } from 'src/utils/bigint-transformer';
-import { HeroesGateway } from './heroes.gateway'; // Подключаем HeroesGateway
+import { HeroGateway } from './heroes.gateway';
 
 @Injectable()
 export class HeroService {
   constructor(
     private prisma: PrismaService,
-    private heroesGateway: HeroesGateway, // Инжектим HeroesGateway
+    private readonly heroGateway: HeroGateway,
   ) {}
 
   async getAllHeroes() {
@@ -46,14 +46,12 @@ export class HeroService {
       data: transformedData,
     });
 
-    // Отправляем обновления через WebSocket
-    this.heroesGateway.server.emit('heroesUpdated', await this.getAllHeroes());
+    this.heroGateway.server.emit('heroCreated', newHero);
 
     return bigintToJSON(newHero);
   }
 
   async updateHero(id: number, updateHeroDto: UpdateHeroDto) {
-    // Сначала проверим, существует ли герой с таким id
     const existingHero = await this.prisma.heroes.findUnique({
       where: { id },
     });
@@ -62,17 +60,14 @@ export class HeroService {
       throw new NotFoundException(`Hero with ID ${id} not found`);
     }
 
-    // Преобразуем данные для обновления
     const transformedData = transformHeroDto(updateHeroDto);
 
-    // Обновляем данные героя
     const updatedHero = await this.prisma.heroes.update({
       where: { id },
       data: transformedData,
     });
 
-    // Отправляем обновления через WebSocket
-    this.heroesGateway.server.emit('heroesUpdated', await this.getAllHeroes());
+    this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));
 
     return bigintToJSON(updatedHero);
   }
@@ -82,12 +77,130 @@ export class HeroService {
       where: { id },
     });
 
-    // Отправляем обновления через WebSocket
-    this.heroesGateway.server.emit('heroesUpdated', await this.getAllHeroes());
+    this.heroGateway.server.emit('heroDeleted', id);
 
     return bigintToJSON({
       message: `Hero with ID ${id} deleted`,
       deletedHero,
     });
+  }
+  async applyDamage(id: number, damage: number) {
+    const hero = await this.prisma.heroes.findUnique({
+      where: { id },
+    });
+
+    if (!hero) {
+      throw new NotFoundException(`Герой с ID ${id} не найден`);
+    }
+
+    let remainingDamage = damage;
+
+    let newTempHp = hero.temp_hp;
+    if (remainingDamage > 0 && newTempHp > 0) {
+      newTempHp -= remainingDamage;
+      if (newTempHp < 0) {
+        remainingDamage = -newTempHp;
+        newTempHp = 0;
+      } else {
+        remainingDamage = 0;
+      }
+    }
+
+    let newBuffHp = hero.buff_hp;
+    if (remainingDamage > 0 && newBuffHp > 0) {
+      newBuffHp -= remainingDamage;
+      if (newBuffHp < 0) {
+        remainingDamage = -newBuffHp;
+        newBuffHp = 0;
+      } else {
+        remainingDamage = 0;
+      }
+    }
+
+    let newCurrentHp = hero.current_hp - remainingDamage;
+    newCurrentHp = newCurrentHp < 0 ? 0 : newCurrentHp;
+
+    const updatedHero = await this.prisma.heroes.update({
+      where: { id },
+      data: {
+        current_hp: newCurrentHp,
+        temp_hp: newTempHp,
+        buff_hp: newBuffHp,
+      },
+    });
+
+    this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));
+
+    return bigintToJSON(updatedHero);
+  }
+
+  async applyHealing(id: number, healing: number) {
+    const hero = await this.prisma.heroes.findUnique({
+      where: { id },
+    });
+
+    if (!hero) {
+      throw new NotFoundException(`Герой с ID ${id} не найден`);
+    }
+
+    let newCurrentHp = hero.current_hp + healing;
+    newCurrentHp = newCurrentHp > hero.max_hp ? hero.max_hp : newCurrentHp; // Не превышаем максимальные хп
+
+    const updatedHero = await this.prisma.heroes.update({
+      where: { id },
+      data: {
+        current_hp: newCurrentHp,
+      },
+    });
+
+    this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));
+
+    return bigintToJSON(updatedHero);
+  }
+
+  async addTempHp(id: number, tempHp: number) {
+    const hero = await this.prisma.heroes.findUnique({
+      where: { id },
+    });
+
+    if (!hero) {
+      throw new NotFoundException(`Герой с ID ${id} не найден`);
+    }
+
+    const newTempHp = hero.temp_hp + tempHp;
+
+    const updatedHero = await this.prisma.heroes.update({
+      where: { id },
+      data: {
+        temp_hp: newTempHp,
+      },
+    });
+
+    this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));
+
+    return bigintToJSON(updatedHero);
+  }
+
+  async addBuffHp(id: number, buffHp: number) {
+    const hero = await this.prisma.heroes.findUnique({
+      where: { id },
+    });
+
+    if (!hero) {
+      throw new NotFoundException(`Герой с ID ${id} не найден`);
+    }
+
+    const newBuffHp = hero.buff_hp + buffHp;
+
+    const updatedHero = await this.prisma.heroes.update({
+      where: { id },
+      data: {
+        buff_hp: newBuffHp,
+      },
+    });
+
+    this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));
+
+    return bigintToJSON(updatedHero);
   }
 }

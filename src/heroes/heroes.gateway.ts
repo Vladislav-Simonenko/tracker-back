@@ -1,28 +1,46 @@
 import {
-  MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  WsResponse,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server } from 'socket.io';
+import { HeroService } from './heroes.service';
+import { Inject, forwardRef } from '@nestjs/common';
 
-@WebSocketGateway(3030) // Порт, на котором WebSocket сервер будет работать
-export class HeroesGateway implements OnGatewayConnection, OnGatewayDisconnect {
+@WebSocketGateway({
+  cors: {
+    origin: 'http://localhost:3001',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+  },
+})
+export class HeroGateway {
   @WebSocketServer() server: Server;
 
-  handleConnection(client: Socket) {
-    console.log('Client connected: ' + client.id);
+  constructor(
+    @Inject(forwardRef(() => HeroService))
+    private readonly heroService: HeroService,
+  ) {}
+  @SubscribeMessage('heroUpdated')
+  async handleHeroUpdate(
+    @MessageBody() heroId: number,
+  ): Promise<WsResponse<any>> {
+    const updatedHero = await this.heroService.getHeroById(heroId);
+    return {
+      event: 'heroUpdated',
+      data: updatedHero,
+    };
   }
 
-  handleDisconnect(client: Socket) {
-    console.log('Client disconnected: ' + client.id);
-  }
-
-  @SubscribeMessage('updateHeroes')
-  handleUpdateHeroes(@MessageBody() data: any): void {
-    console.log('Heroes update data received:', data);
-    this.server.emit('heroesUpdated', data); // Отправляем данные всем подключенным клиентам
+  @SubscribeMessage('heroDeleted')
+  async handleHeroDelete(
+    @MessageBody() heroId: number,
+  ): Promise<WsResponse<any>> {
+    return {
+      event: 'heroDeleted',
+      data: { heroId },
+    };
   }
 }
