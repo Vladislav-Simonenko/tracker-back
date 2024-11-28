@@ -5,6 +5,8 @@ import { UpdateHeroDto } from './dto/update-hero.dto';
 import { transformHeroDto } from 'src/heroes/utils/hero-utils';
 import { bigintToJSON } from 'src/utils/bigint-transformer';
 import { HeroGateway } from './heroes.gateway';
+import { zip } from 'rxjs';
+import { ENHANCER_TOKEN_TO_SUBTYPE_MAP } from '@nestjs/core/constants';
 
 @Injectable()
 export class HeroService {
@@ -33,9 +35,11 @@ export class HeroService {
         user: true,
       },
     });
+
     if (!hero) {
       throw new NotFoundException(`Hero with ID ${id} not found`);
     }
+
     return bigintToJSON(hero);
   }
 
@@ -84,6 +88,7 @@ export class HeroService {
       deletedHero,
     });
   }
+
   async applyDamage(id: number, damage: number) {
     const hero = await this.prisma.heroes.findUnique({
       where: { id },
@@ -174,6 +179,57 @@ export class HeroService {
       data: {
         temp_hp: newTempHp,
       },
+    });
+
+    this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));
+
+    return bigintToJSON(updatedHero);
+  }
+
+  async addCoins(
+    id: number,
+    coins: Partial<{
+      copper: number;
+      silver: number;
+      electrum: number;
+      gold: number;
+      platinum: number;
+    }>,
+  ) {
+    const hero = await this.prisma.heroes.findUnique({
+      where: { id },
+    });
+
+    if (!hero) {
+      throw new NotFoundException(`Герой с ID ${id} не найден`);
+    }
+
+    const updatedData = {
+      copper_coins:
+        coins.copper !== undefined
+          ? hero.copper_coins + coins.copper
+          : hero.copper_coins,
+      silver_coins:
+        coins.silver !== undefined
+          ? hero.silver_coins + coins.silver
+          : hero.silver_coins,
+      electrum_coins:
+        coins.electrum !== undefined
+          ? hero.electrum_coins + coins.electrum
+          : hero.electrum_coins,
+      gold_coins:
+        coins.gold !== undefined
+          ? hero.gold_coins + coins.gold
+          : hero.gold_coins,
+      platinum_coins:
+        coins.platinum !== undefined
+          ? hero.platinum_coins + coins.platinum
+          : hero.platinum_coins,
+    };
+
+    const updatedHero = await this.prisma.heroes.update({
+      where: { id },
+      data: updatedData,
     });
 
     this.heroGateway.server.emit('heroUpdated', bigintToJSON(updatedHero));

@@ -19,6 +19,7 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiParam,
+  ApiFailedDependencyResponse,
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -35,6 +36,22 @@ import {
   AddTempHpDto,
   GetHealingDto,
 } from './dto/get-healing.dto';
+import { AddCoinsDto } from './dto/add-coins.dto';
+import {
+  createSecretKey,
+  createVerify,
+  getHashes,
+  X509Certificate,
+} from 'crypto';
+import { asapScheduler, exhaustAll, zip } from 'rxjs';
+import { waitForDebugger } from 'inspector';
+import { resolveHostname } from 'nodemailer/lib/shared';
+import { rawListeners } from 'process';
+import { IS_LOWERCASE } from 'class-validator';
+import { createSpellSchema } from 'src/spells/schema/create-schema.dto';
+import { setDefaultAutoSelectFamily } from 'net';
+import { K } from 'handlebars';
+import { kStringMaxLength } from 'buffer';
 
 @ApiTags('heroes')
 @Controller('/api/heroes')
@@ -158,7 +175,6 @@ export class HeroController {
     if (isNaN(healing)) {
       throw new BadRequestException('Healing must be a valid number');
     }
-
     return this.heroService.applyHealing(id, healing);
   }
 
@@ -192,5 +208,26 @@ export class HeroController {
     }
 
     return this.heroService.addBuffHp(id, buffHp);
+  }
+
+  @Put(':id/add-coins')
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @ApiBody({
+    description: 'Добавить монеты к герою',
+    type: AddCoinsDto,
+  })
+  async addCoins(@Param('id') id: number, @Body() body: AddCoinsDto) {
+    const hasValidFields = Object.keys(body).some(
+      (key) =>
+        ['copper', 'silver', 'electrum', 'gold', 'platinum'].includes(key) &&
+        Number.isInteger(body[key as keyof AddCoinsDto]),
+    );
+
+    if (!hasValidFields) {
+      throw new BadRequestException(
+        'At least one valid coin type must be provided',
+      );
+    }
+    return this.heroService.addCoins(id, body);
   }
 }
