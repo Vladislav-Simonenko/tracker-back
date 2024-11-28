@@ -5,7 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - '3000:3000' # Для HTTP-сервера
+      - '3030:3030' # Для WebSocket-сервера
     restart: unless-stopped
     depends_on:
       - postgres

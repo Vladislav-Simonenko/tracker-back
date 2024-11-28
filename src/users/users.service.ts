@@ -4,14 +4,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcryptjs from 'bcryptjs';
 import { UserRole } from './dto/user-role.enum';
-import { AuthService } from '@auth/auth.service';
+import { bigintToJSON } from 'src/utils/bigint-transformer';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private prisma: PrismaService,
-    private authService: AuthService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcryptjs.hash(createUserDto.password, 10);
@@ -34,7 +31,7 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       select: {
         id: true,
         email: true,
@@ -44,8 +41,17 @@ export class UsersService {
         isVerified: true,
         createdAt: true,
         updatedAt: true,
+        heroes: {
+          select: {
+            id: true,
+            name: true,
+            world_id: true,
+          },
+        },
       },
     });
+
+    return bigintToJSON(users);
   }
 
   async findOne(id: string) {

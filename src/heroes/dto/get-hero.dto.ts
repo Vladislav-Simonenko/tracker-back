@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GetUserDto } from '@users/dto/get-user.dto';
-import { GetArmorDto } from 'src/armor/dto/get-armor.dto';
-import { GetShieldDto } from 'src/armor/dto/get-shield.dto';
-import { GetRaceDto } from 'src/races/dto/get-race.dto';
-import { GetSubraceDto } from 'src/subraces/dto/get-subrace.dto';
-import { GetWPDto } from 'src/warlock_pacts/dto/get-wp.dto';
-import { GetWorldDto } from 'src/worlds/dto/get-world.dto';
 
-export class GetHeroByIdDto {
+export class GetHeroDto {
   @ApiProperty()
   id: bigint;
 
@@ -121,31 +114,4 @@ export class GetHeroByIdDto {
 
   @ApiProperty()
   warlock_pact_id?: bigint;
-
-  @ApiProperty()
-  armors_heroes_armor_idToarmors: GetArmorDto;
-
-  @ApiProperty()
-  races: GetRaceDto;
-
-  @ApiProperty()
-  armors_heroes_shield_idToarmors: GetShieldDto;
-
-  @ApiProperty()
-  subraces: GetSubraceDto;
-
-  @ApiProperty()
-  warlock_pacts: GetWPDto;
-
-  @ApiProperty()
-  worlds: GetWorldDto;
-
-  @ApiProperty()
-  languages: [];
-
-  @ApiProperty()
-  tools: [];
-
-  @ApiProperty()
-  user: GetUserDto;
 }

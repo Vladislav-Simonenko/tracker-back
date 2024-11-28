@@ -143,58 +143,68 @@ export class CreateHeroDto {
     required: false,
   })
   traits?: string;
+
   @ApiProperty({
     description: 'Hero ideals',
     example: 'string',
     required: false,
   })
   ideals?: string;
+
   @ApiProperty({
     description: 'Hero bounds',
     example: 'string',
     required: false,
   })
   bounds?: string;
+
   @ApiProperty({
     description: 'Hero flaws',
     example: 'string',
     required: false,
   })
   flaws?: string;
+
   @ApiProperty({
     description: 'Hero languages_ids',
     example: [1],
   })
   languages_ids: string | number[];
+
   @ApiProperty({
     description: 'Hero tools_ids',
     example: [1],
   })
   tools_ids: string | number[];
+
   @ApiProperty({
     description: 'Hero armor_id',
     example: 1,
     required: false,
   })
   armor_id?: number;
+
   @ApiProperty({
     description: 'Hero shield_id',
     example: 1,
     required: false,
   })
   shield_id?: number;
+
   @ApiProperty({
     description: 'Hero armor_bonus',
     example: 1,
     required: false,
   })
   armor_bonus?: number;
+
   @ApiProperty({
     description: 'Hero experience',
     example: 1,
     required: false,
   })
   experience?: number;
+
   @ApiProperty({
     description: 'Hero warlock_pact_id',
     example: 1,

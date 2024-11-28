@@ -8,6 +8,9 @@ import {
   Body,
   Put,
   Delete,
+  ValidationPipe,
+  UsePipes,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -16,6 +19,7 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiParam,
+  ApiFailedDependencyResponse,
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -24,9 +28,30 @@ import { createHeroSchema } from './schema/create-hero.schema';
 import { updateHeroSchema } from './schema/update-hero.schema';
 import { HeroService } from './heroes.service';
 import { generateFileName } from 'src/utils/file-utils';
-import { DeleteUserDto } from '@users/dto/delete-user.dto';
 import { DeleteHeroDto } from './dto/delete-hero.dto';
 import { GetHeroByIdDto } from './dto/get-hero-id.dto';
+import { GetDamageDto } from './dto/get-damage.dto';
+import {
+  AddBuffHpDto,
+  AddTempHpDto,
+  GetHealingDto,
+} from './dto/get-healing.dto';
+import { AddCoinsDto } from './dto/add-coins.dto';
+import {
+  createSecretKey,
+  createVerify,
+  getHashes,
+  X509Certificate,
+} from 'crypto';
+import { asapScheduler, exhaustAll, zip } from 'rxjs';
+import { waitForDebugger } from 'inspector';
+import { resolveHostname } from 'nodemailer/lib/shared';
+import { rawListeners } from 'process';
+import { IS_LOWERCASE } from 'class-validator';
+import { createSpellSchema } from 'src/spells/schema/create-schema.dto';
+import { setDefaultAutoSelectFamily } from 'net';
+import { K } from 'handlebars';
+import { kStringMaxLength } from 'buffer';
 
 @ApiTags('heroes')
 @Controller('/api/heroes')
@@ -84,18 +109,34 @@ export class HeroController {
     schema: updateHeroSchema,
   })
   @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './images/heroes',
+        filename: generateFileName,
+      }),
+    }),
+  )
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async updateHero(
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UpdateHeroDto,
   ) {
-    const imageUrl = file ? `/images/heroes/${file.filename}` : null;
+    console.log('Received Body:', body);
+    console.log(
+      'Image URL:',
+      file ? `/images/heroes/${file.filename}` : 'No file uploaded',
+    );
+
+    const imageUrl = file ? `/images/heroes/${file.filename}` : body.image_url;
 
     const updateHeroDto: UpdateHeroDto = {
       ...body,
-      image_url: imageUrl || body.image_url,
+      image_url: imageUrl,
     };
 
+    console.log('Full Request:', { body, file });
     return this.heroService.updateHero(id, updateHeroDto);
   }
 
@@ -104,5 +145,89 @@ export class HeroController {
   @ApiParam({ name: 'id', description: 'ID героя', required: true })
   deleteHero(@Param('id') id: number) {
     return this.heroService.deleteHero(id);
+  }
+
+  @Put(':id/damage')
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @ApiBody({
+    description: 'Применить урон к герою',
+    type: GetDamageDto,
+  })
+  async applyDamage(@Param('id') id: number, @Body() body: GetDamageDto) {
+    const { damage } = body;
+
+    if (isNaN(damage)) {
+      throw new BadRequestException('Damage must be a valid number');
+    }
+
+    return this.heroService.applyDamage(id, damage);
+  }
+
+  @Put(':id/heal')
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @ApiBody({
+    description: 'Применить лечение к герою',
+    type: GetHealingDto,
+  })
+  async applyHealing(@Param('id') id: number, @Body() body: GetHealingDto) {
+    const { healing } = body;
+
+    if (isNaN(healing)) {
+      throw new BadRequestException('Healing must be a valid number');
+    }
+    return this.heroService.applyHealing(id, healing);
+  }
+
+  @Put(':id/temp-hp')
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @ApiBody({
+    description: 'Добавить временные хп герою',
+    type: AddTempHpDto,
+  })
+  async addTempHp(@Param('id') id: number, @Body() body: AddTempHpDto) {
+    const { tempHp } = body;
+
+    if (isNaN(tempHp)) {
+      throw new BadRequestException('Temp HP must be a valid number');
+    }
+
+    return this.heroService.addTempHp(id, tempHp);
+  }
+
+  @Put(':id/buff-hp')
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @ApiBody({
+    description: 'Добавить баффированные хп герою',
+    type: AddBuffHpDto,
+  })
+  async addBuffHp(@Param('id') id: number, @Body() body: AddBuffHpDto) {
+    const { buffHp } = body;
+
+    if (isNaN(buffHp)) {
+      throw new BadRequestException('Buff HP must be a valid number');
+    }
+
+    return this.heroService.addBuffHp(id, buffHp);
+  }
+
+  @Put(':id/add-coins')
+  @ApiParam({ name: 'id', description: 'ID героя', required: true })
+  @ApiBody({
+    description: 'Добавить монеты к герою',
+    type: AddCoinsDto,
+  })
+  async addCoins(@Param('id') id: number, @Body() body: AddCoinsDto) {
+    const hasValidFields = Object.keys(body).some(
+      (key) =>
+        ['copper', 'silver', 'electrum', 'gold', 'platinum'].includes(key) &&
+        Number.isInteger(body[key as keyof AddCoinsDto]),
+    );
+
+    if (!hasValidFields) {
+      throw new BadRequestException(
+        'At least one valid coin type must be provided',
+      );
+    }
+    return this.heroService.addCoins(id, body);
   }
 }
